@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>core js test</title>
+		<script type="text/javascript" src="../src/core.js" ></script>
+	</head>
+	<body>
+		<script>
+			var a = {
+				name: 'tom',
+				age: 15,
+				work: function () {
+					console.log('working');
+				}
+			}
+
+			fore.apply(a, {
+				name: 'marry',
+				la: function () {
+					console.log('laing')
+				}
+			}, false );
+
+			console.log(a);
+
+
+
+			window.N1 = {
+				ajax: 'ajax'
+			};
+			fore.namespace('N1.N2.N3');
+			N1.N2.N3.util = {
+				name: 'jack'
+			}
+			console.log(N1.ajax)
+			console.log(N1.N2.N3.util)
+			fore.namespace('Ns1.Ns2.Ns3');
+			console.log(Ns1.Ns2.Ns3);
+		</script>
+	</body>
+</html>
