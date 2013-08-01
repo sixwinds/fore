@@ -1,4 +1,4 @@
 fore
 ====
 
-small js util lib include basic dom operation, ajax, event binding and helpful utils. Jquery is big one for little site development, fore is the replacement of jquery
+Small js lib including basic dom operation, ajax, event binding and helpful utils. Jquery is heavy one for mini site development, fore is the replacement of jquery
