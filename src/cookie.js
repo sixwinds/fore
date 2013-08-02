@@ -6,7 +6,7 @@
 		},
 		set: function ( name, value, option ) {
 			if ( name ) {
-				var cookieStr = name + '=' + escape( value );
+				var cookieStr = escape( name ) + '=' + escape( value );
 
 				if ( option ) {
 					for ( var oKey in option ) {
@@ -40,7 +40,8 @@
 				document.cookie = cookieStr;
 			}
 		},
-		remove: function ( name ) {
-			//TODO 
+		remove: function ( name, path ) {
+			// QUESTION: domain in removing operation
+			document.cookie = escape(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + ( path ? '; path=' + path : '' );
 		}
 	};
