@@ -36,12 +36,12 @@
 	rootFore.apply( rootFore, {
 		namespace: function ( nsStr ) {
 			if ( nsStr ) {
-				var nsStrArray = nsStr.split('.');
+				var nsStrArray = nsStr.split( '.' );
 				var len = nsStrArray.length;
 				var currentNs = global;
 
 				for ( var i = 0; i < len; i++ ) {
-					var nsName = nsStrArray[i];
+					var nsName = nsStrArray[ i ];
 
 					if ( !currentNs[ nsName ] ) {
 						currentNs[ nsName ] = {};
