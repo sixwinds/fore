@@ -41,6 +41,6 @@
 			}
 		},
 		remove: function ( name ) {
-			// body...
+			//TODO 
 		}
 	};
