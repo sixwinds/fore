@@ -42,6 +42,6 @@
 		},
 		remove: function ( name, path ) {
 			// QUESTION: domain in removing operation
-			document.cookie = escape(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + ( path ? '; path=' + path : '' );
+			document.cookie = escape( name ) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + ( path ? '; path=' + path : '' );
 		}
 	};
