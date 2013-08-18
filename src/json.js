@@ -1,5 +1,6 @@
 	/*
-	 * using third-party lib json2.js https://github.com/douglascrockford/JSON-js , which is under ../lib/JSON-js-master
+	 * using third-party lib json2.js https://github.com/douglascrockford/JSON-js, 
+	 * which is under ../lib/JSON-js-master
 	 */
 	rootFore.json = {
 		parse: function ( str ) {
