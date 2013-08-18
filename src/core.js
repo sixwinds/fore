@@ -1,8 +1,3 @@
-(function ( global, undefined ) {
-	if ( global.fore ) {
-		return;
-	}
-
 	var rootFore = global.fore = function ( id ) {
 
 	};
@@ -89,5 +84,3 @@
 		json
 		trim
 	*/
-
-})(this);

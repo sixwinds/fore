@@ -1,0 +1,16 @@
+{
+    "name":"fore",
+    "version":"0.1.0",
+    "description": "A Basic Dom Util Lib",
+    "author": "Bernie Wang <bernie.wangbj@gmail.com>",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-concat": "~0.3.0",
+        "grunt-contrib-uglify": "~0.2.2",
+        "grunt-contrib-jshint": "~0.6.3"
+    }
+}
