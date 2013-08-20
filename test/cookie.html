@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>core js test</title>
+		<script>
+			var rootFore = {};
+		</script>
+		<script type="text/javascript" src="../src/cookie.js" ></script>
+	</head>
+	<body>
+		<script>
+			function set1() {
+				rootFore.cookie.set( 'testcookie', 'testcookie' );
+			}
+			function set2() {
+				rootFore.cookie.set( 'testcookie', 'testcookie', {
+					domain: 'ent.qq.com'
+				} )
+			}
+			function removeC1() {
+				rootFore.cookie.remove( 'testcookie' );
+			}
+			function removeC2() {
+				rootFore.cookie.remove( 'testcookie', {
+					domain: 'www.qq.com'
+				} );
+			}
+			function get() {
+				alert( rootFore.cookie.get( 'testcookie' ) );
+			}
+		</script>
+
+		<button onclick="set1()">setDefaultDomain</button>
+		<button onclick="set2()">setSpecifyDomain</button>
+		<button onclick="removeC1()">removeDefaultDomain</button>
+		<button onclick="removeC2()">removeSpecifyDomain</button>
+		<button onclick="get()">get</button>
+		1.主动设置的domian前会加.  .www.qq.com和www.qq.com两个不同的domain算两个cookie
+		2.
+
+		1. ie下sessioncookie的domain和非sessioncookie的默认domain
+		2. 父域名和子域名同名cookie
+		3. .前缀cookie
+
+
+A： 父域名和当前域名有同名的cookie，比如qq.com下面有一个叫candy的cookie，ent.qq.com下也有一个叫candy的cookie，那么你删除ent.qq.com的candy的时候还是能拿到qq.com下的candy。如果你的功能是依赖于candy这个cookie的话，可能会出问题。解决方案首先是种cookie的时候要想清楚，全局用的cookie就种在父域名下，如果只是当前域名的自己用的就种在自己的域名下，整站的cookie尽量统一规划。
+B： 如果在种cookie的时候不指定域名，那么各个浏览器给出的默认域名也各不相同。以http://ent.qq.com为例，下表为IE9 chrome firefox下浏览器给出的默认域名
+		                          ie9         chrome       firefox
+session cookie( 没有设过期时间 )  qq.com      ent.qq.com   ent.qq.com
+persistent cookie                 ent.qq.com  ent.qq.com   ent.qq.com
+如果种cookie的时候指定了域名，那么删除的时候也要指定相同的域名，如果种的时候没有指定，那么删除的时候也不要指定。做到set/get一致化。但是！回到第一条说的，最好整站规划好cookie的“作用域”，种的时候都设domain，避免浏览器默认domain引起的不一致性。
+
+C: 做好cookie“作用域”规划，做到set/get一致基本没有啥大问题，不过这里讲一个tricky的问题：chrome下同一个页面设置当前页域名和默认不设置域名，所产生的域名是不同的，比如说在ent.qq.com下如果种cookie不设置域名，则默认域名为ent.qq.com，如果你设置了域名ent.qq.com，则chrome会把你种的这个cookie的域名设为.ent.qq.com，多一个点的前缀。
+	document.domain = 'testcookie=testcookie;';
+	document.domain = 'testcookie=testcookie; domain=ent.qq.com';
+	<picture>
+原则上.ent.qq.com表示的意思是指这个cookie属于ent.qq.com及其所有子域名，而ent.qq.com只是表明ent.qq.com的这个域名。但是在读取权限上这两个形式是没有区别的，无论是ent.qq.com还是xxx.ent.qq.com的域名都能读取到domain是.ent.qq.com或者ent.qq.com的cookie。但是！！( 又来但是了 )对于同名的cookie如果domain一个是.ent.qq.com一个是ent.qq.com，这样算两个不同的cookie，所以最好还是种的时候指明domain，删除的时候也指明。不要种的时候用默认，删除的时候指明domain。
+
+<em>em</em>
+<strong>strong</strong>
+	</body>
+</html>
