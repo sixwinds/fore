@@ -52,35 +52,44 @@
 	/*
 		feature list
 		必要操作：
-		hasClass
-		addClass
-		removeClass
-		getStyle
-		setStyle
-		getElementsByClassName
-		getPosition/getXY
-		remove(remove self from dom)
-		prepend
-		height
-		width
-		offset
-		scrollLeft
-		scrollTop
-		val
+		?hasClass
+		?addClass
+		?removeClass
+		?getStyle
+		?setStyle
+		?getElementsByClassName
+		?getPosition/getXY
+		?remove(remove self from dom)
+		?prepend
+		?height
+		?width
+		?offset
+		?scrollLeft
+		?scrollTop
+		?val
 
-		bind/on
-		unbind/un
+		?bind/on
+		?unbind/un
 
-		cookie.get
-		cookie.set
-		cookie.remove
+		-cookie.get
+		-cookie.set
+		-cookie.remove
 
-		namespace
-		each
-		apply
-		extend
+		-namespace
+		?each
+		-apply
+		?extend
 
-		ajax
-		json
-		trim
+		?ajax
+		-json
+		?trim
 	*/
+	function Fore( htmlElements ) {
+		this.els = htmlElements;
+	}
+
+	Fore.prototype = {
+		hasClass: function () {
+			
+		}
+	}
