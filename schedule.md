@@ -4,3 +4,4 @@
 
 ### DOING:
 * inner html element wrapper class ( src/core.js )
+	1. has/add/removeClass DONE
