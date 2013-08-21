@@ -4,7 +4,7 @@
 	}
 
 	var rootFore = global.fore = function ( id ) {
-
+		return new Fore( HtmlElementsSelector.query( id ) );
 	};
 
 	//pre feature detection
@@ -51,45 +51,149 @@
 
 				return currentNs;
 			}
+		},
+		trim: function ( str ) {
+			if ( str ) {
+				return str.replace(/^\s+|\s+$/g, '');
+			} else {
+				return str;
+			}
 		}
 	} );
 
 	/*
 		feature list
 		必要操作：
-		hasClass
-		addClass
-		removeClass
-		getStyle
-		setStyle
-		getElementsByClassName
-		getPosition/getXY
-		remove(remove self from dom)
-		prepend
-		height
-		width
-		offset
-		scrollLeft
-		scrollTop
-		val
+		-hasClass
+		-addClass
+		-removeClass
+		?getStyle
+		?setStyle
+		?getElementsByClassName
+		?getPosition/getXY
+		?remove(remove self from dom)
+		?prepend
+		?height
+		?width
+		?offset
+		?scrollLeft
+		?scrollTop
+		?val
 
-		bind/on
-		unbind/un
+		?bind/on
+		?unbind/un
 
-		cookie.get
-		cookie.set
-		cookie.remove
+		-cookie.get
+		-cookie.set
+		-cookie.remove
 
-		namespace
-		each
-		apply
-		extend
+		-namespace
+		?each
+		-apply
+		?extend
 
-		ajax
-		json
-		trim
+		?ajax
+		-json
+		-trim
 	*/
+	var REGEXP_NOT_WHITE = /\S+/g;
 
+	// support id only 
+	var HtmlElementsSelector = {
+		query: function ( selectorStr ) {
+			var el = document.getElementById( selectorStr );
+			return el ? [ el ] : null;
+		}
+	}
+
+	function Fore( htmlElements ) {
+		this.els = htmlElements ? htmlElements : [];
+	}
+
+	Fore.prototype = {
+		each: function ( fn ) {
+			if ( fn ) {
+				var len = this.els.length;
+				var els = this.els;
+
+				for ( var i = 0; i < len; i++ ) {
+					fn( i, els[ i ] ); 
+				}
+			}
+		},
+		hasClass: function ( className ) {
+			if ( className ) {
+				var len = this.els.length;
+				var els = this.els;
+
+				for ( var i = 0; i < len; i++ ) {
+					var currentEl = els[ i ];
+
+					if ( currentEl.nodeType === 1 ) {
+						var currentClass = currentEl.className ? ' ' + currentEl.className + ' ' : '';
+						if ( currentClass.indexOf( ' ' + className + ' ' ) > -1 ) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		},
+		addClass: function ( className ) {
+			classNames = rootFore.trim( classNames );
+
+			if ( classNames ) {
+				var newClasses = classNames.match( REGEXP_NOT_WHITE );
+
+				this.each( function ( i, el ) {
+					if ( el.nodeType === 1 ) {
+						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+
+						if ( currentClass ) {
+							var cLen = newClasses.length;
+
+							for ( var j = 0; j < cLen; j++ ) {
+								var newClass = newClasses[ j ];
+								if ( currentClass.indexOf( ' ' + newClass + ' ' ) < 0 ) {
+									currentClass += ( newClass + ' ' );
+								}
+							}
+
+							el.className = rootFore.trim( currentClass );
+						}
+					}
+				} );
+			}
+		},
+		removeClass: function ( classNames ) {
+			classNames = rootFore.trim( classNames );
+
+			if ( classNames ) {
+				var removedClasses = classNames.match( REGEXP_NOT_WHITE );
+
+				this.each( function ( i, el ) {
+					if ( el.nodeType === 1 ) {
+						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要删除的class 
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+
+						if ( currentClass ) {
+							var cLen = removedClasses.length;
+
+							for ( var j = 0; j < cLen; j++ ) {
+								var removedClass = ' ' + removedClasses[ j ] + ' ';
+								if ( currentClass.indexOf( removedClass ) > -1 ) {
+									currentClass = currentClass.replace( removedClass, ' ' );
+								}
+							}
+
+							el.className = rootFore.trim( currentClass );
+						}
+					}
+				} );
+			}
+		}
+	}
 	//Reference: https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
 	rootFore.cookie = {
 		get: function ( name ) {
