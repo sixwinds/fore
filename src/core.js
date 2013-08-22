@@ -106,6 +106,10 @@
 	}
 
 	Fore.prototype = {
+		getHtmlElements: function () {
+			return this.els;
+		},
+
 		each: function ( fn ) {
 			if ( fn ) {
 				var len = this.els.length;
@@ -116,6 +120,7 @@
 				}
 			}
 		},
+
 		hasClass: function ( className ) {
 			if ( className ) {
 				var len = this.els.length;
@@ -134,6 +139,7 @@
 			}
 			return false;
 		},
+
 		addClass: function ( className ) {
 			classNames = rootFore.trim( classNames );
 
@@ -160,7 +166,9 @@
 					}
 				} );
 			}
+			return this;
 		},
+
 		removeClass: function ( classNames ) {
 			classNames = rootFore.trim( classNames );
 
@@ -187,5 +195,33 @@
 					}
 				} );
 			}
+			return this;
+		},
+
+		remove: function () {
+			this.each( function ( i, el ) {
+				var p = el.parentNode;
+
+				if ( p ) {
+					p.removeChild( el );
+					// DANGER: 没有移除当前节点的所有事件监听
+				}
+			} );
+			return this;
+		}，
+
+		prependElement: function ( targetElement ) {
+			this.each( function ( i, el ) {
+				var nodeType = el.nodeType;
+				var newElement = i === 0 ? targetElement : targetElement.cloneNode( true );
+
+				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+					el.insertBefore( newElement, el.firstChild );
+				}
+			} );
+		},
+
+		prependHtml: function ( htmlStr ) {
+			// TODO:需要一个工具函数把htmlstr变成node节点
 		}
 	}
