@@ -92,6 +92,8 @@
 		-trim
 	*/
 	var REGEXP_NOT_WHITE = /\S+/g;
+	var REGEXP_CLASS = /[\n\r\t\f]/g;
+	var domFragment = document.createDocumentFragment();
 
 	// support id only 
 	var HtmlElementsSelector = {
@@ -149,7 +151,7 @@
 				this.each( function ( i, el ) {
 					if ( el.nodeType === 1 ) {
 						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
-						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
 
 						if ( currentClass ) {
 							var cLen = newClasses.length;
@@ -178,7 +180,7 @@
 				this.each( function ( i, el ) {
 					if ( el.nodeType === 1 ) {
 						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要删除的class 
-						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
 
 						if ( currentClass ) {
 							var cLen = removedClasses.length;
