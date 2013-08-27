@@ -53,6 +53,22 @@
 			} else {
 				return str;
 			}
+		},
+		parseHtml: function ( htmlStr ) {
+			var fragment = document.createDocumentFragment();
+			var tmpRootDiv = document.createElement( 'div' );
+			var nodes = [];
+
+			tmpRootDiv.innerHTML = htmlStr;
+
+			var childNodes = tmpRootDiv.childNodes;
+			var len = childNodes.length;
+
+			for ( var i = 0; i < len; i++ ) {
+				fragment.appendChild( childNodes[ i ].cloneNode( true ) );
+			}
+
+			return fragment;
 		}
 	} );
 
@@ -66,8 +82,8 @@
 		?setStyle
 		?getElementsByClassName
 		?getPosition/getXY
-		?remove(remove self from dom)
-		?prepend
+		-remove(remove self from dom)
+		-prependChild
 		?height
 		?width
 		?offset
@@ -93,7 +109,6 @@
 	*/
 	var REGEXP_NOT_WHITE = /\S+/g;
 	var REGEXP_CLASS = /[\n\r\t\f]/g;
-	var domFragment = document.createDocumentFragment();
 
 	// support id only 
 	var HtmlElementsSelector = {
@@ -102,6 +117,7 @@
 			return el ? [ el ] : null;
 		}
 	}
+
 
 	function Fore( htmlElements ) {
 		this.els = htmlElements ? htmlElements : [];
@@ -139,6 +155,7 @@
 					}
 				}
 			}
+
 			return false;
 		},
 
@@ -168,6 +185,7 @@
 					}
 				} );
 			}
+
 			return this;
 		},
 
@@ -197,6 +215,7 @@
 					}
 				} );
 			}
+
 			return this;
 		},
 
@@ -212,7 +231,7 @@
 			return this;
 		}，
 
-		prependElement: function ( targetElement ) {
+		prependChild: function ( targetElement ) {
 			this.each( function ( i, el ) {
 				var nodeType = el.nodeType;
 				var newElement = i === 0 ? targetElement : targetElement.cloneNode( true );
@@ -221,9 +240,32 @@
 					el.insertBefore( newElement, el.firstChild );
 				}
 			} );
+
+			return this;
 		},
 
-		prependHtml: function ( htmlStr ) {
-			// TODO:需要一个工具函数把htmlstr变成node节点
+		prependChildHtml: function ( htmlStr ) {
+			this.each( function ( i, el ) {
+				var nodeType = el.nodeType;
+				var fragment = rootFore.parseHtml( htmlStr );
+
+				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+					el.insertBefore( fragment, el.firstChild );
+				}
+			} );
+
+			return this;
+		},
+
+		getStyle: function ( propertyName ) {
+			// TODO
+		},
+
+		getStyles: function ( propertyNames ) {
+			// TODO
+		},
+
+		setStyle: function ( nameValues ) {
+			// TODO
 		}
 	}
