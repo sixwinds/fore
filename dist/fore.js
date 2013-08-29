@@ -3,6 +3,10 @@
 		return;
 	}
 
+	var REGEXP_NOT_WHITE = /\S+/g;
+	var REGEXP_CLASS = /[\n\r\t\f]/g;
+	var REGEXP_CSS_DASH = /-\w/g;
+
 	var rootFore = global.fore = function ( id ) {
 		return new Fore( HtmlElementsSelector.query( id ) );
 	};
@@ -58,6 +62,29 @@
 			} else {
 				return str;
 			}
+		},
+		parseHtml: function ( htmlStr ) {
+			var fragment = document.createDocumentFragment();
+			var tmpRootDiv = document.createElement( 'div' );
+			var nodes = [];
+
+			tmpRootDiv.innerHTML = htmlStr;
+
+			var childNodes = tmpRootDiv.childNodes;
+			var len = childNodes.length;
+
+			for ( var i = 0; i < len; i++ ) {
+				fragment.appendChild( childNodes[ i ].cloneNode( true ) );
+			}
+
+			return fragment;
+		},
+		parseCssName: function ( propertyName ) {
+			if ( propertyName ) {
+				return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
+					return matchedStr.substr( 1 ).toUpperCase();
+				} );
+			}
 		}
 	} );
 
@@ -71,8 +98,8 @@
 		?setStyle
 		?getElementsByClassName
 		?getPosition/getXY
-		?remove(remove self from dom)
-		?prepend
+		-remove(remove self from dom)
+		-prependChild
 		?height
 		?width
 		?offset
@@ -96,7 +123,6 @@
 		-json
 		-trim
 	*/
-	var REGEXP_NOT_WHITE = /\S+/g;
 
 	// support id only 
 	var HtmlElementsSelector = {
@@ -106,11 +132,16 @@
 		}
 	}
 
+
 	function Fore( htmlElements ) {
 		this.els = htmlElements ? htmlElements : [];
 	}
 
 	Fore.prototype = {
+		getHtmlElements: function () {
+			return this.els;
+		},
+
 		each: function ( fn ) {
 			if ( fn ) {
 				var len = this.els.length;
@@ -121,6 +152,7 @@
 				}
 			}
 		},
+
 		hasClass: function ( className ) {
 			if ( className ) {
 				var len = this.els.length;
@@ -137,8 +169,10 @@
 					}
 				}
 			}
+
 			return false;
 		},
+
 		addClass: function ( className ) {
 			classNames = rootFore.trim( classNames );
 
@@ -148,7 +182,7 @@
 				this.each( function ( i, el ) {
 					if ( el.nodeType === 1 ) {
 						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
-						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
 
 						if ( currentClass ) {
 							var cLen = newClasses.length;
@@ -165,7 +199,10 @@
 					}
 				} );
 			}
+
+			return this;
 		},
+
 		removeClass: function ( classNames ) {
 			classNames = rootFore.trim( classNames );
 
@@ -175,7 +212,7 @@
 				this.each( function ( i, el ) {
 					if ( el.nodeType === 1 ) {
 						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要删除的class 
-						var currentClass = el.className ? ' ' + rootFore.trim( el.className ) + ' ' : '';
+						var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
 
 						if ( currentClass ) {
 							var cLen = removedClasses.length;
@@ -189,6 +226,75 @@
 
 							el.className = rootFore.trim( currentClass );
 						}
+					}
+				} );
+			}
+
+			return this;
+		},
+
+		remove: function () {
+			this.each( function ( i, el ) {
+				var p = el.parentNode;
+
+				if ( p ) {
+					p.removeChild( el );
+					// DANGER: 没有移除当前节点的所有事件监听
+				}
+			} );
+			return this;
+		},
+
+		prependChild: function ( targetElement ) {
+			this.each( function ( i, el ) {
+				var nodeType = el.nodeType;
+				var newElement = i === 0 ? targetElement : targetElement.cloneNode( true );
+
+				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+					el.insertBefore( newElement, el.firstChild );
+				}
+			} );
+
+			return this;
+		},
+
+		prependChildHtml: function ( htmlStr ) {
+			this.each( function ( i, el ) {
+				var nodeType = el.nodeType;
+				var fragment = rootFore.parseHtml( htmlStr );
+
+				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+					el.insertBefore( fragment, el.firstChild );
+				}
+			} );
+
+			return this;
+		},
+
+		getStyle: function ( propertyName ) {
+			var formatPorpertyName = rootFore.parseCssName( propertyName );
+			var el = this.getHtmlElements()[ 0 ];
+
+			if ( el.nodeType === 1 ) {
+				return el.style[ formatPorpertyName ];
+			}
+		},
+
+		getStyles: function ( propertyNames ) {
+			// TODO
+		},
+
+		setStyle: function ( nameValues ) {
+			var formatNameValues = {};
+
+			for ( var key in nameValues ) {
+				if ( nameValues.hasOwnProperty( key ) ) {
+					formatNameValues[ rootFore.parseCssName( key ) ] = nameValues[ key ];
+				}
+
+				this.each( function ( i, el ) {
+					if ( el.nodeType === 1 ) {
+						rootFore.apply( el.style, formatNameValues );
 					}
 				} );
 			}

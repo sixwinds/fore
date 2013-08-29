@@ -26,7 +26,7 @@ module.exports = function( grunt ) {
           'dist/fore-min.js': [ 'dist/fore.js' ]
         }
       }
-    },
+    }
     // watch任务
     // watch: { … }
   } );

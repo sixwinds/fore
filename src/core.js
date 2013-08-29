@@ -1,3 +1,7 @@
+	var REGEXP_NOT_WHITE = /\S+/g;
+	var REGEXP_CLASS = /[\n\r\t\f]/g;
+	var REGEXP_CSS_DASH = /-\w/g;
+
 	var rootFore = global.fore = function ( id ) {
 		return new Fore( HtmlElementsSelector.query( id ) );
 	};
@@ -69,6 +73,13 @@
 			}
 
 			return fragment;
+		},
+		parseCssName: function ( propertyName ) {
+			if ( propertyName ) {
+				return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
+					return matchedStr.substr( 1 ).toUpperCase();
+				} );
+			}
 		}
 	} );
 
@@ -107,8 +118,6 @@
 		-json
 		-trim
 	*/
-	var REGEXP_NOT_WHITE = /\S+/g;
-	var REGEXP_CLASS = /[\n\r\t\f]/g;
 
 	// support id only 
 	var HtmlElementsSelector = {
@@ -229,7 +238,7 @@
 				}
 			} );
 			return this;
-		}，
+		},
 
 		prependChild: function ( targetElement ) {
 			this.each( function ( i, el ) {
@@ -258,7 +267,12 @@
 		},
 
 		getStyle: function ( propertyName ) {
-			// TODO
+			var formatPorpertyName = rootFore.parseCssName( propertyName );
+			var el = this.getHtmlElements()[ 0 ];
+
+			if ( el.nodeType === 1 ) {
+				return el.style[ formatPorpertyName ];
+			}
 		},
 
 		getStyles: function ( propertyNames ) {
@@ -266,6 +280,18 @@
 		},
 
 		setStyle: function ( nameValues ) {
-			// TODO
+			var formatNameValues = {};
+
+			for ( var key in nameValues ) {
+				if ( nameValues.hasOwnProperty( key ) ) {
+					formatNameValues[ rootFore.parseCssName( key ) ] = nameValues[ key ];
+				}
+
+				this.each( function ( i, el ) {
+					if ( el.nodeType === 1 ) {
+						rootFore.apply( el.style, formatNameValues );
+					}
+				} );
+			}
 		}
 	}
