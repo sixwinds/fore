@@ -1,6 +1,10 @@
 	var REGEXP_NOT_WHITE = /\S+/g;
 	var REGEXP_CLASS = /[\n\r\t\f]/g;
 	var REGEXP_CSS_DASH = /-\w/g;
+	var SPEC_CSS_NAME = '|float|';
+	var JS_CSS_NAME = {};
+	var coreToString = {}.toString;
+
 
 	var rootFore = global.fore = function ( id ) {
 		return new Fore( HtmlElementsSelector.query( id ) );
@@ -8,9 +12,17 @@
 
 	//pre feature detection
 	rootFore.feature = {
-
+		hasW3cCssFloat: ( function () {
+			var d = document.createElement( 'div' );
+			return 'cssFloat' in d.style;
+		} )()
 	};
 
+	if ( rootFore.feature.hasW3cCssFloat ) {
+		JS_CSS_NAME.float = 'cssFloat';
+	} else {
+		JS_CSS_NAME.float = 'styleFloat';
+	}
 	// common utils
 
 	/*
@@ -76,10 +88,19 @@
 		},
 		parseCssName: function ( propertyName ) {
 			if ( propertyName ) {
-				return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
-					return matchedStr.substr( 1 ).toUpperCase();
-				} );
+
+				if ( SPEC_CSS_NAME.indexOf( '|' + propertyName + '|' ) > -1 ) {
+					return JS_CSS_NAME[ propertyName ];
+				} else {
+					return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
+						return matchedStr.substr( 1 ).toUpperCase();
+					} );	
+				}
+
 			}
+		},
+		isArray: Array.isArray || function ( obj ) {
+			return coreToString.call( obj ) === '[object Array]';
 		}
 	} );
 
@@ -267,11 +288,17 @@
 		},
 
 		getStyle: function ( propertyName ) {
+			// 把css的属性名转换成js中style的属性名
 			var formatPorpertyName = rootFore.parseCssName( propertyName );
-			var el = this.getHtmlElements()[ 0 ];
+			var els = this.getHtmlElements();
+			var len = els.length;
+			var currentEl;
 
-			if ( el.nodeType === 1 ) {
-				return el.style[ formatPorpertyName ];
+			for ( var i = 0; i < len; i++ ) {
+				currentEl = els[ i ];
+				if ( currentEl.nodeType === 1 ) {
+					return el.style[ formatPorpertyName ];
+				}
 			}
 		},
 
@@ -284,6 +311,7 @@
 
 			for ( var key in nameValues ) {
 				if ( nameValues.hasOwnProperty( key ) ) {
+					// 把css的属性名转换成js中style的属性名
 					formatNameValues[ rootFore.parseCssName( key ) ] = nameValues[ key ];
 				}
 
