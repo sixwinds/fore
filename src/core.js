@@ -189,7 +189,7 @@
 			return false;
 		},
 
-		addClass: function ( className ) {
+		addClass: function ( classNames ) {
 			classNames = rootFore.trim( classNames );
 
 			if ( classNames ) {
@@ -200,18 +200,15 @@
 						// 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
 						var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
 
-						if ( currentClass ) {
-							var cLen = newClasses.length;
-
-							for ( var j = 0; j < cLen; j++ ) {
-								var newClass = newClasses[ j ];
-								if ( currentClass.indexOf( ' ' + newClass + ' ' ) < 0 ) {
-									currentClass += ( newClass + ' ' );
-								}
+						var cLen = newClasses.length;
+						for ( var j = 0; j < cLen; j++ ) {
+							var newClass = newClasses[ j ];
+							if ( currentClass.indexOf( ' ' + newClass + ' ' ) < 0 ) {
+								currentClass += ( newClass + ' ' );
 							}
-
-							el.className = rootFore.trim( currentClass );
 						}
+
+						el.className = rootFore.trim( currentClass );
 					}
 				} );
 			}
