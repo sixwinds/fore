@@ -6,57 +6,53 @@ module( 'Core Dom', {
 } );
 
 test( 'add class test', function () {
-	var f = fore( 'qunit-fixture' );
-	var fe = f.getHtmlElements()[ 0 ];
+	var d = fore.q( 'qunit-fixture' );
 
-	f.addClass( 'single-class' );
-	deepEqual( fe.className, 'single-class' );
+	fore.addClass( d, 'single-class' );
+	deepEqual( d.className, 'single-class' );
 
-	f.addClass( 'double-a-class double-b-class');
-	deepEqual( fe.className, 'single-class double-a-class double-b-class' );
+	fore.addClass( d, 'double-a-class double-b-class');
+	deepEqual( d.className, 'single-class double-a-class double-b-class' );
 
-	f.addClass( 'double-c-class			double-d-class');
-	deepEqual( fe.className, 'single-class double-a-class double-b-class double-c-class double-d-class' );
+	fore.addClass( d, 'double-c-class			double-d-class');
+	deepEqual( d.className, 'single-class double-a-class double-b-class double-c-class double-d-class' );
 
-	f.addClass( '		double-e-class');
-	deepEqual( fe.className, 'single-class double-a-class double-b-class double-c-class double-d-class double-e-class' );
+	fore.addClass( d, '		double-e-class');
+	deepEqual( d.className, 'single-class double-a-class double-b-class double-c-class double-d-class double-e-class' );
 } );
 
 test( 'has class test', function () {
-	var f = fore( 'qunit-fixture' );
+	var d = fore.q( 'qunit-fixture' );
 
-	ok( f.hasClass( 'single-class' ) );
-	ok( f.hasClass( 'double-b-class' ) );
-	ok( f.hasClass( 'double-e-class' ) );
+	ok( fore.hasClass( d, 'single-class' ) );
+	ok( fore.hasClass( d, 'double-b-class' ) );
+	ok( fore.hasClass( d, 'double-e-class' ) );
 } );
 
 test( 'remove class test', function () {
-	var f = fore( 'qunit-fixture' );
-	var fe = f.getHtmlElements()[ 0 ];
+	var d = fore.q( 'qunit-fixture' );
 
-	f.removeClass( 'single-class' );
-	deepEqual( fe.className, 'double-a-class double-b-class double-c-class double-d-class double-e-class' );
+	fore.removeClass( d, 'single-class' );
+	deepEqual( d.className, 'double-a-class double-b-class double-c-class double-d-class double-e-class' );
 
-	f.removeClass( 'double-c-class' );
-	deepEqual( fe.className, 'double-a-class double-b-class double-d-class double-e-class' );
+	fore.removeClass( d, 'double-c-class' );
+	deepEqual( d.className, 'double-a-class double-b-class double-d-class double-e-class' );
 
-	f.removeClass( 'double-a-class  double-d-class' );
-	deepEqual( fe.className, 'double-b-class double-e-class' );
-
+	fore.removeClass( d, 'double-a-class  double-d-class' );
+	deepEqual( d.className, 'double-b-class double-e-class' );
 } );
 
 test( 'prepend child', function () {
-	var f = fore( 'qunit-fixture' );
-	var fe = f.getHtmlElements()[ 0 ];
+	var d = fore.q( 'qunit-fixture' );
 	var htmlElementsArray = this.htmlElements.split( ' ' );
 	var len = htmlElementsArray.length;
 	var prependElementTagNames = '';
 
 	for ( var i = len -1; i >= 0; i-- ) {
-		f.prependChild( document.createElement( htmlElementsArray[ i ] ) );
+		fore.prependChild( d, document.createElement( htmlElementsArray[ i ] ) );
 	}
 
-	var childNodes = fe.childNodes;
+	var childNodes = d.childNodes;
 	var clen = childNodes.length;
 	for ( var j = 0; j < clen; j++ ) {
 		if ( j === 0 ) {
@@ -68,4 +64,13 @@ test( 'prepend child', function () {
 	}
 
 	equal( prependElementTagNames, this.htmlElements );
+} );
+
+test( 'prepend html', function () {
+	var el = f.q( 'qunit-fixture' );
+	var htmlStr = '<div>i am a web developer</div><ul><li>javascript</li><li>html</li><li>css</li><li>nodejs</li></ul>'
+
+	f.prependChildHtml( el, htmlStr );
+	equal( el.innerHTML, htmlStr );
+
 } );
