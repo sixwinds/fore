@@ -1,5 +1,5 @@
 ### TODO: 
-* cookie qunit test ( test/cookie.js )
+* cookie test case ( test/cookie.js )
 * util function in core qunit test ( test/core.js )
 * each
 * getElementsByClassName
@@ -37,3 +37,4 @@
 
 
 ### DOING:
++ dom operation test case ( test/core.js )
