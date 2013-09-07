@@ -6,9 +6,10 @@
 	var REGEXP_NOT_WHITE = /\S+/g;
 	var REGEXP_CLASS = /[\n\r\t\f]/g;
 	var REGEXP_CSS_DASH = /-\w/g;
-	var SPEC_CSS_NAME = '|float|';
-	var JS_CSS_NAME = {};
-	var coreToString = JS_CSS_NAME.toString;
+	var OBJ_JS_CSS_NAME = {};
+	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
+	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
+	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
 
 
 	var rootFore = global.fore = global.f = {};
@@ -16,16 +17,12 @@
 	//pre feature detection
 	rootFore.feature = {
 		hasW3cCssFloat: ( function () {
-			var d = document.createElement( 'div' );
-			return 'cssFloat' in d.style;
+			return 'cssFloat' in OBJ_CSS_TESTER_EL.style;
 		} )()
 	};
 
-	if ( rootFore.feature.hasW3cCssFloat ) {
-		JS_CSS_NAME.float = 'cssFloat';
-	} else {
-		JS_CSS_NAME.float = 'styleFloat';
-	}
+	OBJ_JS_CSS_NAME.float = rootFore.feature.hasW3cCssFloat ? 'cssFloat' : 'styleFloat';
+
 	// common utils
 
 	/*
@@ -94,20 +91,46 @@
 
 		parseCssName: function ( propertyName ) {
 			if ( propertyName ) {
-
-				if ( SPEC_CSS_NAME.indexOf( '|' + propertyName + '|' ) > -1 ) {
-					return JS_CSS_NAME[ propertyName ];
+				if ( OBJ_JS_CSS_NAME[ propertyName ] ) {
+					return OBJ_JS_CSS_NAME[ propertyName ];
 				} else {
-					return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
+
+					var parsedPropertyName = propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
 						return matchedStr.substr( 1 ).toUpperCase();
-					} );	
+					} );
+
+					if ( parsedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+						OBJ_JS_CSS_NAME[ propertyName ] = parsedPropertyName;
+						return parsedPropertyName;
+					} else {
+
+						parsedPropertyName = parsedPropertyName.substring( 0, 1 ).toUpperCase() + parsedPropertyName.substr( 1 );
+						var len = ARRAY_JS_CSS_NAME_PREFIX.length;
+
+						for ( var i = 0; i < len; i++ ) {
+							var prefixedPropertyName = ARRAY_JS_CSS_NAME_PREFIX[ i ] + parsedPropertyName;
+							
+							if ( prefixedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+								OBJ_JS_CSS_NAME[ propertyName ] = prefixedPropertyName;
+								return prefixedPropertyName;
+							}
+						}
+					}
 				}
+
+				// if ( SPEC_CSS_NAME.indexOf( '|' + propertyName + '|' ) > -1 ) {
+				// 	return OBJ_JS_CSS_NAME[ propertyName ];
+				// } else {
+					// return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
+					// 	return matchedStr.substr( 1 ).toUpperCase();
+					// } );	
+				// }
 
 			}
 		},
 
 		isArray: Array.isArray || function ( obj ) {
-			return coreToString.call( obj ) === '[object Array]';
+			return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
 		},
 
 		q: function ( elId ) { // elId will be enhanced to selectorStr, currently just support id
@@ -223,11 +246,10 @@
 			if ( el && propertyName ) {
 				// 把css的属性名转换成js中style的属性名
 				var formatPorpertyName = rootFore.parseCssName( propertyName );
-				if ( el.nodeType === 1 ) {
+				
+				if ( el.nodeType === 1 && formatPorpertyName ) {
 					return el.style[ formatPorpertyName ];
 				}
-
-				return el;
 			}
 		},
 
@@ -242,7 +264,8 @@
 				for ( var key in nameValues ) {
 					if ( nameValues.hasOwnProperty( key ) ) {
 						// 把css的属性名转换成js中style的属性名
-						formatNameValues[ rootFore.parseCssName( key ) ] = nameValues[ key ];
+						var parsedName = rootFore.parseCssName( key );
+						parsedName ? formatNameValues[ parsedName ] = nameValues[ key ] : '';
 					}
 
 					if ( el.nodeType === 1 ) {
