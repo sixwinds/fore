@@ -15,12 +15,11 @@
 * extend
 * ajax
 * setStyles
-* 完善css3的setstyle：JS_CSS_NAME
 
 ### DONE
 - has/add/removeClass
 - remove 
-- getHtmlElements
+- q
 - remove(remove self from dom)
 - prependChild
 - prependChildHtml
@@ -33,7 +32,7 @@
 - trim
 - isArray
 - getStyle
-- setStyle
+- setStyle 完善css3的setstyle：JS_CSS_NAME
 
 
 ### DOING:
