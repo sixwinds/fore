@@ -40,6 +40,8 @@ test( 'remove class test', function () {
 
 	fore.removeClass( d, 'double-a-class  double-d-class' );
 	deepEqual( d.className, 'double-b-class double-e-class' );
+	// clean class
+	d.className = '';
 } );
 
 test( 'prepend child', function () {
@@ -73,4 +75,47 @@ test( 'prepend html', function () {
 	f.prependChildHtml( el, htmlStr );
 	equal( el.innerHTML, htmlStr );
 
+} );
+
+test( 'remove self', function () {
+	var el = f.q( 'qunit-fixture' );
+	var d = document.createElement( 'div' );
+	el.appendChild( d );
+
+	equal( el.childNodes.length, 1 );
+
+	f.remove( d );
+	equal( el.childNodes.length, 0 );
+} );
+
+test( 'set/getStyle', function () {
+	var el = f.q( 'qunit-fixture' );
+
+	f.setStyle( el, {
+		'float': 'left',
+		'text-align': 'center',
+		'background-position-y': '3px',
+		'margin': '0',
+	} );
+
+	deepEqual( f.getStyle( el, 'float' ), 'left' );
+	deepEqual( f.getStyle( el, 'text-align' ), 'center' );
+	deepEqual( f.getStyle( el, 'background-position-y' ), '3px' );
+	deepEqual( f.getStyle( el, 'margin' ), '0px' );
+	// clean style
+	el.style.cssText = '';
+} );
+
+test( 'set/getStyle [css3]', function () {
+	var el = f.q( 'qunit-fixture' );
+
+	f.setStyle( el, {
+		'border-radius': '5px',
+		'box-align': 'center'
+	} );
+
+	deepEqual( f.getStyle( el, 'border-radius' ), '5px' );
+	deepEqual( f.getStyle( el, 'box-align' ), 'center' );
+	// clean style
+	el.style.cssText = '';
 } );
