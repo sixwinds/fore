@@ -37,3 +37,4 @@
 
 ### DOING:
 + dom operation test case ( test/core.js )
++ jquery-1.10.2.js $().width/height() =&gt; line:9718 =&gt; line:9724 jQuery.access =&gt; line:9749 jQuery.css
