@@ -34,8 +34,37 @@
             </tr>
         </table>
        
-
-<div style="font-size:20px; line-height:1;" id="cc">aabbccddeeff</div>
+        <div id="cptCssTestor" style="width:100px; float: left; text-align: center;"></div>
+        <table border="1">
+            <tr>
+                <td></td>
+                <td>width</td>
+                <td>float</td>
+                <td>text-align</td>
+                <td>textAlign</td>
+            </tr>
+            <tr>
+                <td>getComputedStyle.getPropertyName</td>
+                <td id="01"></td>
+                <td id="02"></td>
+                <td id="03"></td>
+                <td id="04"></td>
+            </tr>
+            <tr>
+                <td>getComputedStyle[ propertyName ]</td>
+                <td id="11"></td>
+                <td id="12"></td>
+                <td id="13"></td>
+                <td id="14"></td>
+            </tr>
+            <tr>
+                <td>currentStyle[ propertyName ]</td>
+                <td id="21"></td>
+                <td id="22"></td>
+                <td id="23"></td>
+                <td id="24"></td>
+            </tr>
+        </table>
 
     <script type="text/javascript">
         var cwTextEl1 = document.getElementById( 'clientWidth1' );
@@ -60,9 +89,55 @@
         owTextEl2.innerHTML = el2.offsetWidth;
         ohTextEl2.innerHTML = el2.offsetHeight;
 
-        $( '#testDiv2' ).width();
+        function computedStyle( el, propertyName, type ) {
+            if ( window.getComputedStyle ) {
+                if ( type === 1 ) {
+                    return window.getComputedStyle( el, null ).getPropertyValue( propertyName );
+                } else if ( type === 2 ) {
+                    return window.getComputedStyle( el, null )[ propertyName ];
+                }
+            }
+        }
 
-        alert($('#cc').height())
+        function curStyle( el, propertyName ) {
+            if ( document.documentElement.currentStyle ) {
+                return el.currentStyle[ propertyName ];
+            }
+        }
+        var dt = document.getElementById('cptCssTestor');
+
+        for (var i = 0; i < 3; i++) {
+            for (var j = 1; j < 5; j++ ) {
+                var id = ''+i+j;
+                var e = document.getElementById(id);
+                var pn;
+                switch( j ) {
+                    case 1: 
+                        pn = 'width';
+                        break;
+                    case 2:
+                        pn = 'float';
+                        break;
+                    case 3:
+                        pn = 'text-align';
+                        break;
+                    case 4:
+                        pn = 'textAlign';
+                        break;
+                }
+                switch( i ) {
+                    case 0:
+                        e.innerHTML = computedStyle(dt, pn, 1);
+                        break
+                    case 1:
+                        e.innerHTML = computedStyle(dt, pn, 2);
+                        break
+                    case 2:
+                        e.innerHTML = curStyle(dt, pn);
+                        break
+                }
+            }
+        }
     </script>
     </body>
 </html>
