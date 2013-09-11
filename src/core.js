@@ -39,6 +39,25 @@
 		}
 	};
 
+	var cptCss;
+	if ( window.getComputedStyle ) {
+		cptCss = function ( el, propertyName ) {
+			if ( el ) {
+				var style = window.getComputedStyle( el, null );
+
+				return style.getPropertyValue( propertyName ) || style[ propertyName ];
+			}
+		}
+	} else if ( document.documentElement.currentStyle ) {
+		cptCss = function ( el, propertyName ) {
+			if ( el ) {
+				var style = el.currentStyle;
+
+				return style[ propertyName ];
+			}
+		}
+	}
+
 	rootFore.apply( rootFore, {
 		namespace: function ( nsStr ) {
 			if ( nsStr ) {
@@ -112,15 +131,6 @@
 						}
 					}
 				}
-
-				// if ( SPEC_CSS_NAME.indexOf( '|' + propertyName + '|' ) > -1 ) {
-				// 	return OBJ_JS_CSS_NAME[ propertyName ];
-				// } else {
-					// return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
-					// 	return matchedStr.substr( 1 ).toUpperCase();
-					// } );	
-				// }
-
 			}
 		},
 
@@ -268,6 +278,14 @@
 					}
 				}
 			}
+		},
+
+		getWidth: function ( el ) {
+			cptCss( el, 'width' );
+		},
+
+		getHeight: function ( el ) {
+			cptCss( el, 'height' );
 		}
 
 	} );
