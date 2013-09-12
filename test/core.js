@@ -111,11 +111,13 @@ test( 'set/getStyle [css3]', function () {
 
 	f.setStyle( el, {
 		'border-radius': '5px',
-		'box-align': 'center'
+		'box-align': 'center',
+		'-webkit-box-sizing': 'border-box'
 	} );
 
 	deepEqual( f.getStyle( el, 'border-radius' ), '5px' );
 	deepEqual( f.getStyle( el, 'box-align' ), 'center' );
+	deepEqual( f.getStyle( el, '-webkit-box-sizing' ), 'border-box' )
 	// clean style
 	el.style.cssText = '';
 } );
