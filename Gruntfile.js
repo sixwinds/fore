@@ -11,6 +11,7 @@ module.exports = function( grunt ) {
         src: [
           'src/intro.js', 
           'src/core.js', 
+          'src/event.js',
           'src/cookie.js', 
           'lib/JSON-js-master/json2.js',
           'src/json.js', 
