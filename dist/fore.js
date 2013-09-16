@@ -3,13 +3,24 @@
 		return;
 	}
 
+	// 匹配非空白字符
 	var REGEXP_NOT_WHITE = /\S+/g;
+	// 匹配元素class之间的分隔符
 	var REGEXP_CLASS = /[\n\r\t\f]/g;
+	// 匹配css名字中横杠及后一个字母
 	var REGEXP_CSS_DASH = /-\w/g;
+	// 匹配ie css名前缀
+	var REGEXP_CSS_MS_PREFIX = /^-ms-/g;
+
+	// 存放css名和js名的映射关系
 	var OBJ_JS_CSS_NAME = {};
 	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
-	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
+
+	// object的原生toString函数
 	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
+
+	// 各个浏览器在javascript中css名的前缀
+	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
 
 
 	var rootFore = global.fore = global.f = {};
@@ -43,6 +54,61 @@
 			}
 		}
 	};
+
+	function toCamel( cssName ) {
+		return cssName.replace( REGEXP_CSS_MS_PREFIX, 'ms-').replace( REGEXP_CSS_DASH, function ( matchedStr ){
+					return matchedStr.substr( 1 ).toUpperCase();
+				} );
+	}
+
+	function parseCssName( propertyName ) {
+		if ( propertyName ) {
+			if ( OBJ_JS_CSS_NAME[ propertyName ] ) {
+				return OBJ_JS_CSS_NAME[ propertyName ];
+			} else {
+
+				var parsedPropertyName = toCamel( propertyName );
+
+				if ( parsedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+					OBJ_JS_CSS_NAME[ propertyName ] = parsedPropertyName;
+					return parsedPropertyName;
+				} else {
+
+					parsedPropertyName = parsedPropertyName.substring( 0, 1 ).toUpperCase() + parsedPropertyName.substr( 1 );
+					var len = ARRAY_JS_CSS_NAME_PREFIX.length;
+
+					for ( var i = 0; i < len; i++ ) {
+						var prefixedPropertyName = ARRAY_JS_CSS_NAME_PREFIX[ i ] + parsedPropertyName;
+						
+						if ( prefixedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+							OBJ_JS_CSS_NAME[ propertyName ] = prefixedPropertyName;
+							return prefixedPropertyName;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	var cptCss;
+	if ( window.getComputedStyle ) {
+		cptCss = function ( el, propertyName ) {
+			if ( el ) {
+				var style = window.getComputedStyle( el, null );
+
+				return style.getPropertyValue( propertyName ) || style[ propertyName ];
+			}
+		}
+	} else if ( document.documentElement.currentStyle ) {
+
+		cptCss = function ( el, propertyName ) {
+			if ( el ) {
+				var style = el.currentStyle;
+
+				return style[ parseCssName( propertyName ) ];
+			}
+		}
+	}
 
 	rootFore.apply( rootFore, {
 		namespace: function ( nsStr ) {
@@ -87,46 +153,6 @@
 			}
 
 			return fragment;
-		},
-
-		parseCssName: function ( propertyName ) {
-			if ( propertyName ) {
-				if ( OBJ_JS_CSS_NAME[ propertyName ] ) {
-					return OBJ_JS_CSS_NAME[ propertyName ];
-				} else {
-
-					var parsedPropertyName = propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
-						return matchedStr.substr( 1 ).toUpperCase();
-					} );
-
-					if ( parsedPropertyName in OBJ_CSS_TESTER_EL.style ) {
-						OBJ_JS_CSS_NAME[ propertyName ] = parsedPropertyName;
-						return parsedPropertyName;
-					} else {
-
-						parsedPropertyName = parsedPropertyName.substring( 0, 1 ).toUpperCase() + parsedPropertyName.substr( 1 );
-						var len = ARRAY_JS_CSS_NAME_PREFIX.length;
-
-						for ( var i = 0; i < len; i++ ) {
-							var prefixedPropertyName = ARRAY_JS_CSS_NAME_PREFIX[ i ] + parsedPropertyName;
-							
-							if ( prefixedPropertyName in OBJ_CSS_TESTER_EL.style ) {
-								OBJ_JS_CSS_NAME[ propertyName ] = prefixedPropertyName;
-								return prefixedPropertyName;
-							}
-						}
-					}
-				}
-
-				// if ( SPEC_CSS_NAME.indexOf( '|' + propertyName + '|' ) > -1 ) {
-				// 	return OBJ_JS_CSS_NAME[ propertyName ];
-				// } else {
-					// return propertyName.replace( REGEXP_CSS_DASH, function ( matchedStr ){
-					// 	return matchedStr.substr( 1 ).toUpperCase();
-					// } );	
-				// }
-
-			}
 		},
 
 		isArray: Array.isArray || function ( obj ) {
@@ -245,7 +271,7 @@
 		getStyle: function ( el, propertyName ) {
 			if ( el && propertyName ) {
 				// 把css的属性名转换成js中style的属性名
-				var formatPorpertyName = rootFore.parseCssName( propertyName );
+				var formatPorpertyName = parseCssName( propertyName );
 				
 				if ( el.nodeType === 1 && formatPorpertyName ) {
 					return el.style[ formatPorpertyName ];
@@ -264,7 +290,7 @@
 				for ( var key in nameValues ) {
 					if ( nameValues.hasOwnProperty( key ) ) {
 						// 把css的属性名转换成js中style的属性名
-						var parsedName = rootFore.parseCssName( key );
+						var parsedName = parseCssName( key );
 						parsedName ? formatNameValues[ parsedName ] = nameValues[ key ] : '';
 					}
 
@@ -273,10 +299,62 @@
 					}
 				}
 			}
+		},
+
+		getWidth: function ( el ) {
+			cptCss( el, 'width' );
+		},
+
+		getHeight: function ( el ) {
+			cptCss( el, 'height' );
 		}
 
 	} );
 
+	var bindEvt;
+	var unbindEvt;
+
+	// 自定义event
+	// TODO
+
+	function toIeEventType( type ) {
+		return type ? 'on' + type : type;
+	}
+
+	if ( document.addEventListener ) {
+		bindEvt = function ( el, type, listener, useCapture ) {
+			// 如果dom支持events模块，文档树中每个node都实现EventTarget接口
+			if ( el ) {
+				el.addEventListener( type, listener, useCapture );
+			}
+		};
+
+		unbindEvt = function ( el, type, listener, useCapture ) {
+			if ( el ) {
+				el.removeEventListener( type, listener, useCapture );
+			}
+		};
+	} else {
+
+		bindEvt = function ( el, type, listener ) {
+			if ( el ) {
+				el.attachEvent( toIeEventType( type ), listener );
+			}
+		};
+
+		unbindEvt = function ( el, type, listener ) {
+			if ( el ) {
+				el.detachEvent( toIeEventType( type ), listener );
+			}
+		}
+	}
+
+	rootFore.apply( rootFore, {
+		bind: bindEvt,
+
+		unbind: unbindEvt
+	} );
+	
 	//Reference: https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
 	rootFore.cookie = {
 		get: function ( name ) {
