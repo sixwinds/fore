@@ -22,12 +22,12 @@
 
 	//pre feature detection
 	rootFore.feature = {
-		hasW3cCssFloat: ( function () {
+		isCssFloat: ( function () {
 			return 'cssFloat' in OBJ_CSS_TESTER_EL.style;
 		} )()
 	};
 
-	OBJ_JS_CSS_NAME.float = rootFore.feature.hasW3cCssFloat ? 'cssFloat' : 'styleFloat';
+	OBJ_JS_CSS_NAME.float = rootFore.feature.isCssFloat ? 'cssFloat' : 'styleFloat';
 
 	// common utils
 
@@ -86,10 +86,10 @@
 	}
 
 	var cptCss;
-	if ( window.getComputedStyle ) {
+	if ( global.event && srcElement in global.event .getComputedStyle ) {
 		cptCss = function ( el, propertyName ) {
 			if ( el ) {
-				var style = window.getComputedStyle( el, null );
+				var style = global.event && srcElement in global.event .getComputedStyle( el, null );
 
 				return style.getPropertyValue( propertyName ) || style[ propertyName ];
 			}
