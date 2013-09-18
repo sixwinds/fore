@@ -106,6 +106,8 @@
 	}
 
 	rootFore.apply( rootFore, {
+		// 全局 GUID 计数器
+		guid: 1, 
 		namespace: function ( nsStr ) {
 			if ( nsStr ) {
 				var nsStrArray = nsStr.split( '.' );

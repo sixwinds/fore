@@ -111,6 +111,8 @@
 	}
 
 	rootFore.apply( rootFore, {
+		// 全局 GUID 计数器
+		guid: 1, 
 		namespace: function ( nsStr ) {
 			if ( nsStr ) {
 				var nsStrArray = nsStr.split( '.' );
@@ -313,6 +315,7 @@
 
 	var bindEvt;
 	var unbindEvt;
+	var OBJ_EVENT_HANDLERS = {};
 
 	rootFore.Event = function ( e ) {
 		var fromElement = e.fromElement;
@@ -349,9 +352,30 @@
 	}
 
 	function createListenerWrapper( listener ) {
-		return function ( e ) {
-			listener.apply( this, new rootFore.Event( e || window.event ) );
+		if ( !listener.guid ) {
+			listener.guid = rootFore.guid++;
+		}
+
+		var wrapper = function ( e ) {
+			listener.call( this, new rootFore.Event( e || window.event ) );
 		};
+		OBJ_EVENT_HANDLERS[ listener.guid ] = wrapper;
+		
+		return wrapper;
+	}
+
+	function findListenerWrapper( listener, remove ) {
+		var lguid = listener.guid;
+
+		if ( lguid ) {
+			var ret = OBJ_EVENT_HANDLERS[ lguid ];
+
+			if ( remove === true ) {
+				delete OBJ_EVENT_HANDLERS[ lguid ];
+			}
+
+			return ret;
+		}
 	}
 
 	if ( document.addEventListener ) {
@@ -364,7 +388,7 @@
 
 		unbindEvt = function ( el, type, listener, useCapture ) {
 			if ( el ) {
-				el.removeEventListener( type, createListenerWrapper( listener ), useCapture );
+				el.removeEventListener( type, findListenerWrapper( listener, true ), useCapture );
 			}
 		};
 	} else {
@@ -377,7 +401,7 @@
 
 		unbindEvt = function ( el, type, listener ) {
 			if ( el ) {
-				el.detachEvent( toIeEventType( type ), createListenerWrapper( listener ) );
+				el.detachEvent( toIeEventType( type ), findListenerWrapper( listener, true ) );
 			}
 		}
 	}
