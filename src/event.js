@@ -5,7 +5,7 @@
 	rootFore.Event = function ( e ) {
 		var fromElement = e.fromElement;
 
-		this.orignalEvent = e;
+		this.originalEvent = e;
 		this.target = e.target || e.srcElement;
 		this.metaKey = !!e.metaKey;
 		this.relatedTarget = e.relatedTarget || ( fromElement === this.target ) ? e.fromElement : e.toElement;
@@ -14,7 +14,7 @@
 
 	rootFore.Event.prototype = {
 		stopPropagation: function () {
-			var oe = this.orignalEvent;
+			var oe = this.originalEvent;
 
 			if ( oe.stopPropagation ) {
 				oe.stopPropagation();
@@ -23,7 +23,7 @@
 		},
 
 		preventDefault: function () {
-			var oe = this.orignalEvent;
+			var oe = this.originalEvent;
 
 			if ( oe.preventDefault ) {
 				oe.preventDefault();

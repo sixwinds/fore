@@ -19,11 +19,13 @@ module( 'Event', {
 	}
 } );
 
-asyncTest( 'add event listener', function () {
+asyncTest( 'add event listener and fore.Event.target', 3, function () {
 	var d = f.q( 'qunit-fixture' );
 
 	f.bind( d, 'click', function ( e ) {
+		equal( '[object MouseEvent]', {}.toString.call(e.originalEvent) );
 		equal( 'qunit-fixture', e.target.id );
+		equal( false, e.metaKey );
 
 		start();
 	} );
@@ -31,7 +33,7 @@ asyncTest( 'add event listener', function () {
 	this.invoke( d, 'click' );
 } );
 
-test( 'remove event listener', function () {
+asyncTest( 'remove event listener', 1, function () {
 	var flag = false;
 	var handler = function () {
 		flag = true;
@@ -42,7 +44,11 @@ test( 'remove event listener', function () {
 	f.unbind( d, 'click', handler );
 
 	this.invoke( d, 'click' );
-	// TODO 这里应该是异步的
-	equal( false, flag );
 
+	setTimeout( function () {
+		equal( false, flag );
+		start();
+	}, 1000 );
+	
+// todo
 } );

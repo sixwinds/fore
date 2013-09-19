@@ -73,7 +73,8 @@ test( 'prepend html', function () {
 	var htmlStr = '<div>i am a web developer</div><ul><li>javascript</li><li>html</li><li>css</li><li>nodejs</li></ul>'
 
 	f.prependChildHtml( el, htmlStr );
-	equal( el.innerHTML, htmlStr );
+	// 为了兼容ie需要做大小写和过滤空行的操作
+	equal( el.innerHTML.toLowerCase().replace(/[\n|\r]/g, ''), htmlStr );
 
 } );
 
