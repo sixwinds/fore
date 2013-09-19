@@ -2,7 +2,8 @@ module( 'Event', {
 	setup: function () {
 		this.eventTypeMap = {
 			click: 'MouseEvents',
-			mouseover: 'MouseEvents'
+			mouseover: 'MouseEvents',
+			mouseout: 'MouseEvents'
 		};
 
 		if ( document.createEvent ) {
@@ -20,16 +21,19 @@ module( 'Event', {
 	}
 } );
 
-asyncTest( 'add event listener and fore.Event.target', function () {
+asyncTest( 'add event listener and fore.Event.target|originalEvent|metaKey', function () {
 	expect( 3 );
-	var d = f.q( 'qunit-fixture' );
+	var d = document.createElement( 'div' );
+	d.id = 'addEvent';
+	document.body.appendChild( d );
 
 	f.bind( d, 'click', function ( e ) {
-		equal( '[object MouseEvent]', {}.toString.call(e.originalEvent) );
-		equal( 'qunit-fixture', e.target.id );
+		equal( 'click', e.originalEvent.type );
+		equal( 'addEvent', e.target.id );
 		equal( false, e.metaKey );
 
 		start();
+		document.body.removeChild( d );
 	} );
 
 	this.invoke( d, 'click' );
@@ -42,18 +46,56 @@ asyncTest( 'remove event listener', function () {
 	var handler = function () {
 		flag = true;
 	};
-	var d = f.q( 'qunit-fixture' );
+	var d = document.createElement( 'div' );
+	document.body.appendChild( d );
 
-	f.bind( d, 'mouseover', handler );
-	f.unbind( d, 'mouseover', handler );
+	f.bind( d, 'click', handler );
+	f.unbind( d, 'click', handler );
 
-	this.invoke( d, 'mouseover' );
+	this.invoke( d, 'click' );
 
 	setTimeout( function () {
 		equal( false, flag );
 
 		start();
+		document.body.removeChild( d );
 	}, 1000 );
+	
+} );
+
+asyncTest( 'fore.Event.relatedTarget - mouseover', function () {
+	expect( 1 );
+
+	var d = document.createElement( 'div' );
+	document.body.appendChild( d );
+
+	f.bind( d, 'mouseover', function ( e ) {
+		// ie下程序触发的mouseover没有relatedTarget
+		deepEqual( d, e.relatedTarget );
+
+		start();
+		document.body.removeChild( d );
+	} );
+
+	this.invoke( d, 'mouseover' );
+	
+} );
+
+asyncTest( 'fore.Event.relatedTarget - mouseout', function () {
+	expect( 1 );
+
+	var d = document.createElement( 'div' );
+	document.body.appendChild( d );
+
+	f.bind( d, 'mouseout', function ( e ) {
+		// ie下程序触发的mouseout没有relatedTarget
+		deepEqual( d, e.relatedTarget );
+
+		start();
+		document.body.removeChild( d );
+	} );
+
+	this.invoke( d, 'mouseout' );
 	
 } );
 
