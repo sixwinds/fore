@@ -1,7 +1,8 @@
 module( 'Event', {
 	setup: function () {
 		this.eventTypeMap = {
-			click: 'MouseEvents'
+			click: 'MouseEvents',
+			mouseover: 'MouseEvents'
 		};
 
 		if ( document.createEvent ) {
@@ -19,7 +20,8 @@ module( 'Event', {
 	}
 } );
 
-asyncTest( 'add event listener and fore.Event.target', 3, function () {
+asyncTest( 'add event listener and fore.Event.target', function () {
+	expect( 3 );
 	var d = f.q( 'qunit-fixture' );
 
 	f.bind( d, 'click', function ( e ) {
@@ -33,22 +35,25 @@ asyncTest( 'add event listener and fore.Event.target', 3, function () {
 	this.invoke( d, 'click' );
 } );
 
-asyncTest( 'remove event listener', 1, function () {
+asyncTest( 'remove event listener', function () {
+	expect( 1 );
+
 	var flag = false;
 	var handler = function () {
 		flag = true;
 	};
 	var d = f.q( 'qunit-fixture' );
 
-	f.bind( d, 'click', handler );
-	f.unbind( d, 'click', handler );
+	f.bind( d, 'mouseover', handler );
+	f.unbind( d, 'mouseover', handler );
 
-	this.invoke( d, 'click' );
+	this.invoke( d, 'mouseover' );
 
 	setTimeout( function () {
 		equal( false, flag );
+
 		start();
 	}, 1000 );
 	
-// todo
 } );
+
