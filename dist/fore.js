@@ -6,6 +6,12 @@
 	var rootFore = global.fore = global.f = {};
 
 	// common utils
+	/*
+	 * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
+	 * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
+	 */
+	var FN_CORE_HASOWNPROPERTY = OBJ_JS_CSS_NAME.hasOwnProperty;
+
 	if ( !Array.prototype.forEach ) {
 		Array.prototype.forEach = function ( callback, scope ) {
 			var i;
@@ -23,14 +29,14 @@
 		if ( cover !== false ) {
 			// 覆盖掉同名的属性
 			for ( var key in obj ) {
-				if ( obj.hasOwnProperty( key ) ) {
+				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
 					target[ key ] = obj[ key ];
 				}
 			}
 		} else {
 			// 保留同名属性
 			for ( var key in obj ) {
-				if ( obj.hasOwnProperty( key ) && target[ key ] === undefined ) {
+				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) && target[ key ] === undefined ) {
 					target[ key ] = obj[ key ];
 				}
 			}
@@ -78,10 +84,7 @@
 
 				var key;
 				for ( key in obj ) {
-					if ( obj.hasOwnProperty && obj.hasOwnProperty( key ) ) {
-						callback( obj[ key ], key, obj );
-					} else {
-						
+					if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
 						callback( obj[ key ], key, obj );
 					}
 				}
@@ -102,7 +105,7 @@
 	var OBJ_JS_CSS_NAME = {};
 	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
 
-	// object的原生toString函数
+	// object的原生函数
 	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
 
 	// 各个浏览器在javascript中css名的前缀
