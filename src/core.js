@@ -11,14 +11,11 @@
 	var OBJ_JS_CSS_NAME = {};
 	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
 
-	// object的原生toString函数
+	// object的原生函数
 	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
 
 	// 各个浏览器在javascript中css名的前缀
 	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
-
-
-	var rootFore = global.fore = global.f = {};
 
 	//pre feature detection
 	rootFore.feature = {
@@ -28,27 +25,6 @@
 	};
 
 	OBJ_JS_CSS_NAME.float = rootFore.feature.isCssFloat ? 'cssFloat' : 'styleFloat';
-
-	// common utils
-
-	/*
-	 * Merge the contents of two objects together into the first object.
-	 */
-	rootFore.apply = function ( target, obj, cover ) {
-		if ( cover !== false ) {
-			for ( var key in obj ) {
-				if ( obj.hasOwnProperty( key ) ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		} else {
-			for ( var key in obj ) {
-				if ( obj.hasOwnProperty( key ) && target[ key ] === undefined ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		}
-	};
 
 	function toCamel( cssName ) {
 		return cssName.replace( REGEXP_CSS_MS_PREFIX, 'ms-').replace( REGEXP_CSS_DASH, function ( matchedStr ){
@@ -106,35 +82,6 @@
 	}
 
 	rootFore.apply( rootFore, {
-		// 全局 GUID 计数器
-		guid: 1, 
-		namespace: function ( nsStr ) {
-			if ( nsStr ) {
-				var nsStrArray = nsStr.split( '.' );
-				var len = nsStrArray.length;
-				var currentNs = global;
-
-				for ( var i = 0; i < len; i++ ) {
-					var nsName = nsStrArray[ i ];
-
-					if ( !currentNs[ nsName ] ) {
-						currentNs[ nsName ] = {};
-					}
-					currentNs = currentNs[ nsName ];
-				}
-
-				return currentNs;
-			}
-		},
-
-		trim: function ( str ) {
-			if ( str ) {
-				return str.replace(/^\s+|\s+$/g, '');
-			} else {
-				return str;
-			}
-		},
-
 		parseHtml: function ( htmlStr ) {
 			var fragment = document.createDocumentFragment();
 			var tmpRootDiv = document.createElement( 'div' );
@@ -150,10 +97,6 @@
 			}
 
 			return fragment;
-		},
-
-		isArray: Array.isArray || function ( obj ) {
-			return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
 		},
 
 		q: function ( elId ) { // elId will be enhanced to selectorStr, currently just support id

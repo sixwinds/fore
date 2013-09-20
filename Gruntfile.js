@@ -10,6 +10,8 @@ module.exports = function( grunt ) {
       dist: {
         src: [
           'src/intro.js', 
+          'src/global-namespace.js',
+          'src/utils.js',
           'src/core.js', 
           'src/event.js',
           'src/cookie.js', 

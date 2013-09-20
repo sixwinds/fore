@@ -1,7 +1,6 @@
 ### TODO: 
 * cookie test case ( test/cookie.js )
 * util function in core qunit test ( test/core.js )
-* each
 * getElementsByClassName
 * getPosition/getXY
 * offset
@@ -10,7 +9,7 @@
 * val
 * extend
 * ajax
-* setStyles
+* getStyles
 * jquery里面的csshooks？
 
 ### DONE
@@ -31,6 +30,7 @@
 - getStyle
 - setStyle 完善css3的setstyle：JS_CSS_NAME
 - bind/unbind
+- each
 
 
 ### DOING:
