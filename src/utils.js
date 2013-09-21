@@ -82,5 +82,9 @@
 					}
 				}
 			}
+		},
+
+		extend: function ( superClass, subProperty ) {
+			// TODO
 		}
 	} );
