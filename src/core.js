@@ -12,7 +12,7 @@
 	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
 
 	// object的原生函数
-	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
+	var FN_CORE_TOSTRING = Object.prototype.toString;
 
 	// 各个浏览器在javascript中css名的前缀
 	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];

@@ -10,7 +10,7 @@
 	 * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
 	 * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
 	 */
-	var FN_CORE_HASOWNPROPERTY = OBJ_JS_CSS_NAME.hasOwnProperty;
+	var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
 
 	if ( !Array.prototype.forEach ) {
 		Array.prototype.forEach = function ( callback, scope ) {
@@ -20,6 +20,22 @@
 			for ( i = 0; i < len; i++ ) {
 				callback.call( scope, this[ i ], i, this );
 			}
+		};
+	}
+
+	if ( !Object.create ) {
+		Object.create = function ( proto, propertiesObject ) {
+			var F = function () {
+
+			};
+			F.prototype = proto;
+			var f = new F();
+
+			rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
+				f[ propertyName ] = propertyValueConfig.value;
+			} );
+
+			return f;
 		};
 	}
 	/*
@@ -89,6 +105,34 @@
 					}
 				}
 			}
+		},
+
+		extend: function ( superClass, subProperty ) {
+			var subClass = function () {
+				superClass.call( this );
+			};
+
+			rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
+				var value = propertyValue;
+				overrides[ propertyName ] = {
+					value: propertyValue,
+					configurable: true,
+					enumerable: true,
+					writable: true
+				};
+			} );
+
+			subClass.prototype = Object.create( superClass.prototype, subProperty );
+			subClass.prototype.constructor = subClass;
+			subClass.superClass = superClass;
+
+			return subClass;
+		},
+
+		extendSubClass: function ( subClass, superClass, subProperty ) {
+			subClass.prototype = Object.create( superClass.prototype, subProperty );
+			subClass.prototype.constructor = subClass;
+			subClass.superClass = superClass;
 		}
 	} );
 
@@ -106,7 +150,7 @@
 	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
 
 	// object的原生函数
-	var FN_CORE_TOSTRING = OBJ_JS_CSS_NAME.toString;
+	var FN_CORE_TOSTRING = Object.prototype.toString;
 
 	// 各个浏览器在javascript中css名的前缀
 	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];

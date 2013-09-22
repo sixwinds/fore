@@ -3,7 +3,7 @@
 	 * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
 	 * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
 	 */
-	var FN_CORE_HASOWNPROPERTY = OBJ_JS_CSS_NAME.hasOwnProperty;
+	var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
 
 	if ( !Array.prototype.forEach ) {
 		Array.prototype.forEach = function ( callback, scope ) {
@@ -21,7 +21,7 @@
 			var F = function () {
 
 			};
-			f.prototype = proto;
+			F.prototype = proto;
 			var f = new F();
 
 			rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {

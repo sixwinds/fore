@@ -3,6 +3,7 @@
     <head>
        <meta charset="utf-8">
        <script type="text/javascript" src="../lib/jquery/jquery-1.10.2.js"></script>
+       <script type="text/javascript" src="../dist/fore.js"></script>
     </head>
     <body>
         <table>
@@ -138,6 +139,44 @@
                 }
             }
         }
+
+
+
+        Object.create2 = function ( proto, propertiesObject ) {
+            var F = function () {
+
+            };
+            F.prototype = proto;
+            var f = new F();
+
+            fore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
+                f[ propertyName ] = propertyValueConfig.value;
+            } );
+
+            return f;
+        };
+
+        function Person() {
+
+        }
+
+        Person.prototype.read = function () {
+
+        }
+
+        var teacherProto = Object.create2( Person.prototype, {
+            say: {
+                value: function () {
+                    console.log('say')
+                },
+                configurable: true,
+                enumerable: true,
+                writable: true
+            }
+        });
+
+alert( teacherProto.read+' --- '+teacherProto.hasOwnProperty('read'))
+alert( teacherProto.say+' --- '+teacherProto.hasOwnProperty('say'))
     </script>
     </body>
 </html>
