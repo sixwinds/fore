@@ -15,6 +15,22 @@
 			}
 		};
 	}
+
+	if ( !Object.create ) {
+		Object.create = function ( proto, propertiesObject ) {
+			var F = function () {
+
+			};
+			f.prototype = proto;
+			var f = new F();
+
+			rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
+				f[ propertyName ] = propertyValueConfig.value;
+			} );
+
+			return f;
+		};
+	}
 	/*
 	 * Merge the contents of two objects together into the first object.
 	 */
@@ -85,6 +101,30 @@
 		},
 
 		extend: function ( superClass, subProperty ) {
-			// TODO
+			var subClass = function () {
+				superClass.call( this );
+			};
+
+			rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
+				var value = propertyValue;
+				overrides[ propertyName ] = {
+					value: propertyValue,
+					configurable: true,
+					enumerable: true,
+					writable: true
+				};
+			} );
+
+			subClass.prototype = Object.create( superClass.prototype, subProperty );
+			subClass.prototype.constructor = subClass;
+			subClass.superClass = superClass;
+
+			return subClass;
+		},
+
+		extendSubClass: function ( subClass, superClass, subProperty ) {
+			subClass.prototype = Object.create( superClass.prototype, subProperty );
+			subClass.prototype.constructor = subClass;
+			subClass.superClass = superClass;
 		}
 	} );
