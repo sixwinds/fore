@@ -1,1 +1,1 @@
-	var rootFore = global.fore = global.f = {};
+    var rootFore = global.fore = global.f = {};

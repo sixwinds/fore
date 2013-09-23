@@ -1,557 +1,557 @@
 (function ( global, undefined ) {
-	if ( global.fore ) {
-		return;
-	}
-
-	var rootFore = global.fore = global.f = {};
-
-	// common utils
-	/*
-	 * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
-	 * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
-	 */
-	var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
-
-	if ( !Array.prototype.forEach ) {
-		Array.prototype.forEach = function ( callback, scope ) {
-			var i;
-			var len = this.length;
-
-			for ( i = 0; i < len; i++ ) {
-				callback.call( scope, this[ i ], i, this );
-			}
-		};
-	}
-
-	if ( !Object.create ) {
-		Object.create = function ( proto, propertiesObject ) {
-			var F = function () {
-
-			};
-			F.prototype = proto;
-			var f = new F();
-
-			rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
-				f[ propertyName ] = propertyValueConfig.value;
-			} );
-
-			return f;
-		};
-	}
-	/*
-	 * Merge the contents of two objects together into the first object.
-	 */
-	rootFore.apply = function ( target, obj, cover ) {
-		if ( cover !== false ) {
-			// 覆盖掉同名的属性
-			for ( var key in obj ) {
-				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		} else {
-			// 保留同名属性
-			for ( var key in obj ) {
-				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) && target[ key ] === undefined ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		}
-	};
-
-	rootFore.apply( rootFore, {
-		// 全局 GUID 计数器
-		guid: 1, 
-		namespace: function ( nsStr ) {
-			if ( nsStr ) {
-				var nsStrArray = nsStr.split( '.' );
-				var len = nsStrArray.length;
-				var currentNs = global;
-
-				for ( var i = 0; i < len; i++ ) {
-					var nsName = nsStrArray[ i ];
-
-					if ( !currentNs[ nsName ] ) {
-						currentNs[ nsName ] = {};
-					}
-					currentNs = currentNs[ nsName ];
-				}
-
-				return currentNs;
-			}
-		},
-
-		trim: function ( str ) {
-			if ( str ) {
-				return str.replace(/^\s+|\s+$/g, '');
-			} else {
-				return str;
-			}
-		},
-
-		isArray: Array.isArray || function ( obj ) {
-			return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
-		},
-
-		each: function ( obj, callback ) {
-			if ( rootFore.isArray( obj ) ) {
-				obj.forEach( callback );
-			} else {
-
-				var key;
-				for ( key in obj ) {
-					if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
-						callback( obj[ key ], key, obj );
-					}
-				}
-			}
-		},
-
-		extend: function ( superClass, subProperty ) {
-			var subClass = function () {
-				superClass.call( this );
-			};
-
-			rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
-				var value = propertyValue;
-				overrides[ propertyName ] = {
-					value: propertyValue,
-					configurable: true,
-					enumerable: true,
-					writable: true
-				};
-			} );
-
-			subClass.prototype = Object.create( superClass.prototype, subProperty );
-			subClass.prototype.constructor = subClass;
-			subClass.superClass = superClass;
-
-			return subClass;
-		},
-
-		extendSubClass: function ( subClass, superClass, subProperty ) {
-			subClass.prototype = Object.create( superClass.prototype, subProperty );
-			subClass.prototype.constructor = subClass;
-			subClass.superClass = superClass;
-		}
-	} );
-
-	// 匹配非空白字符
-	var REGEXP_NOT_WHITE = /\S+/g;
-	// 匹配元素class之间的分隔符
-	var REGEXP_CLASS = /[\n\r\t\f]/g;
-	// 匹配css名字中横杠及后一个字母
-	var REGEXP_CSS_DASH = /-\w/g;
-	// 匹配ie css名前缀
-	var REGEXP_CSS_MS_PREFIX = /^-ms-/g;
-
-	// 存放css名和js名的映射关系
-	var OBJ_JS_CSS_NAME = {};
-	var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
-
-	// object的原生函数
-	var FN_CORE_TOSTRING = Object.prototype.toString;
-
-	// 各个浏览器在javascript中css名的前缀
-	var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
-
-	//pre feature detection
-	rootFore.feature = {
-		isCssFloat: ( function () {
-			return 'cssFloat' in OBJ_CSS_TESTER_EL.style;
-		} )()
-	};
-
-	OBJ_JS_CSS_NAME.float = rootFore.feature.isCssFloat ? 'cssFloat' : 'styleFloat';
-
-	function toCamel( cssName ) {
-		return cssName.replace( REGEXP_CSS_MS_PREFIX, 'ms-').replace( REGEXP_CSS_DASH, function ( matchedStr ){
-					return matchedStr.substr( 1 ).toUpperCase();
-				} );
-	}
-
-	function parseCssName( propertyName ) {
-		if ( propertyName ) {
-			if ( OBJ_JS_CSS_NAME[ propertyName ] ) {
-				return OBJ_JS_CSS_NAME[ propertyName ];
-			} else {
-
-				var parsedPropertyName = toCamel( propertyName );
-
-				if ( parsedPropertyName in OBJ_CSS_TESTER_EL.style ) {
-					OBJ_JS_CSS_NAME[ propertyName ] = parsedPropertyName;
-					return parsedPropertyName;
-				} else {
-
-					parsedPropertyName = parsedPropertyName.substring( 0, 1 ).toUpperCase() + parsedPropertyName.substr( 1 );
-					var len = ARRAY_JS_CSS_NAME_PREFIX.length;
-
-					for ( var i = 0; i < len; i++ ) {
-						var prefixedPropertyName = ARRAY_JS_CSS_NAME_PREFIX[ i ] + parsedPropertyName;
-						
-						if ( prefixedPropertyName in OBJ_CSS_TESTER_EL.style ) {
-							OBJ_JS_CSS_NAME[ propertyName ] = prefixedPropertyName;
-							return prefixedPropertyName;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	var cptCss;
-	if ( global.event && srcElement in global.event .getComputedStyle ) {
-		cptCss = function ( el, propertyName ) {
-			if ( el ) {
-				var style = global.event && srcElement in global.event .getComputedStyle( el, null );
-
-				return style.getPropertyValue( propertyName ) || style[ propertyName ];
-			}
-		}
-	} else if ( document.documentElement.currentStyle ) {
-
-		cptCss = function ( el, propertyName ) {
-			if ( el ) {
-				var style = el.currentStyle;
-
-				return style[ parseCssName( propertyName ) ];
-			}
-		}
-	}
-
-	rootFore.apply( rootFore, {
-		parseHtml: function ( htmlStr ) {
-			var fragment = document.createDocumentFragment();
-			var tmpRootDiv = document.createElement( 'div' );
-			var nodes = [];
-
-			tmpRootDiv.innerHTML = htmlStr;
-
-			var childNodes = tmpRootDiv.childNodes;
-			var len = childNodes.length;
-
-			for ( var i = 0; i < len; i++ ) {
-				fragment.appendChild( childNodes[ i ].cloneNode( true ) );
-			}
-
-			return fragment;
-		},
-
-		q: function ( elId ) { // elId will be enhanced to selectorStr, currently just support id
-			return document.getElementById( elId );
-		},
-
-		hasClass: function ( el, className ) {
-			if ( el && className ) {
-				if ( el.nodeType === 1 ) {
-
-					var currentClass = el.className ? ' ' + el.className + ' ' : '';
-					if ( currentClass.indexOf( ' ' + className + ' ' ) > -1 ) {
-						return true;
-					}
-
-				}
-			}
-
-			return false;
-		},
-
-		addClass: function ( el, classNames ) {
-			if ( el && classNames ) {
-				classNames = rootFore.trim( classNames );
-
-				var newClasses = classNames.match( REGEXP_NOT_WHITE );
-
-				if ( el.nodeType === 1 ) {
-					// 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
-					var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
-
-					var cLen = newClasses.length;
-					for ( var j = 0; j < cLen; j++ ) {
-						var newClass = newClasses[ j ];
-						if ( currentClass.indexOf( ' ' + newClass + ' ' ) < 0 ) {
-							currentClass += ( newClass + ' ' );
-						}
-					}
-
-					el.className = rootFore.trim( currentClass );
-				}
-
-				return el;
-			}
-		},
-
-		removeClass: function ( el, classNames ) {
-			if ( el && classNames ) {
-				classNames = rootFore.trim( classNames );
-
-				var removedClasses = classNames.match( REGEXP_NOT_WHITE );
-
-				if ( el.nodeType === 1 ) {
-					// 在当前class前后加空格是为了方便下面判断当前class是否存在需要删除的class 
-					var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
-
-					if ( currentClass ) {
-						var cLen = removedClasses.length;
-
-						for ( var j = 0; j < cLen; j++ ) {
-							var removedClass = ' ' + removedClasses[ j ] + ' ';
-							if ( currentClass.indexOf( removedClass ) > -1 ) {
-								currentClass = currentClass.replace( removedClass, ' ' );
-							}
-						}
-
-						el.className = rootFore.trim( currentClass );
-					}
-				}
-
-				return el;
-			}
-		},
-
-		remove: function ( el ) {
-			if ( el ) {
-				var p = el.parentNode;
-
-				if ( p ) {
-					p.removeChild( el );
-					// DANGER: 没有移除当前节点的所有事件监听
-				}
-				return el;
-			}
-		},
-
-		prependChild: function ( el, childElement ) {
-			if ( el && childElement ) {
-				var nodeType = el.nodeType;
-
-				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
-					el.insertBefore( childElement, el.firstChild );
-				}
-
-				return el;
-			}
-		},
-
-		prependChildHtml: function ( el, htmlStr ) {
-			if ( el && htmlStr ) {
-				var nodeType = el.nodeType;
-				var fragment = rootFore.parseHtml( htmlStr );
-
-				if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
-					el.insertBefore( fragment, el.firstChild );
-				}
-
-				return el;
-			}
-		},
-
-		getStyle: function ( el, propertyName ) {
-			if ( el && propertyName ) {
-				// 把css的属性名转换成js中style的属性名
-				var formatPorpertyName = parseCssName( propertyName );
-				
-				if ( el.nodeType === 1 && formatPorpertyName ) {
-					return el.style[ formatPorpertyName ];
-				}
-			}
-		},
-
-		getStyles: function ( propertyNames ) {
-			// TODO
-		},
-
-		setStyle: function ( el, nameValues ) {
-			if ( el && nameValues ) {
-				var formatNameValues = {};
-
-				for ( var key in nameValues ) {
-					if ( nameValues.hasOwnProperty( key ) ) {
-						// 把css的属性名转换成js中style的属性名
-						var parsedName = parseCssName( key );
-						parsedName ? formatNameValues[ parsedName ] = nameValues[ key ] : '';
-					}
-
-					if ( el.nodeType === 1 ) {
-						rootFore.apply( el.style, formatNameValues );
-					}
-				}
-			}
-		},
-
-		getWidth: function ( el ) {
-			cptCss( el, 'width' );
-		},
-
-		getHeight: function ( el ) {
-			cptCss( el, 'height' );
-		}
-
-	} );
-
-	var bindEvt;
-	var unbindEvt;
-	var OBJ_EVENT_HANDLERS = {};
-
-	rootFore.Event = function ( e ) {
-		var fromElement = e.fromElement;
-
-		this.originalEvent = e;
-		this.target = e.target || e.srcElement;
-		this.metaKey = !!e.metaKey;
-		this.relatedTarget = e.relatedTarget || ( fromElement === this.target ) ? e.fromElement : e.toElement;
-	};
-
-
-	rootFore.Event.prototype = {
-		stopPropagation: function () {
-			var oe = this.originalEvent;
-
-			if ( oe.stopPropagation ) {
-				oe.stopPropagation();
-			}
-			oe.cancelBubble = true;
-		},
-
-		preventDefault: function () {
-			var oe = this.originalEvent;
-
-			if ( oe.preventDefault ) {
-				oe.preventDefault();
-			}
-			oe.returnValue = false;
-		}
-	};
-
-	function toIeEventType( type ) {
-		return type ? 'on' + type : type;
-	}
-
-	function createListenerWrapper( listener ) {
-		if ( !listener.guid ) {
-			listener.guid = rootFore.guid++;
-		}
-
-		var wrapper = function ( e ) {
-			listener.call( this, new rootFore.Event( e || window.event ) );
-		};
-		OBJ_EVENT_HANDLERS[ listener.guid ] = wrapper;
-		
-		return wrapper;
-	}
-
-	function findListenerWrapper( listener, remove ) {
-		var lguid = listener.guid;
-
-		if ( lguid ) {
-			var ret = OBJ_EVENT_HANDLERS[ lguid ];
-
-			if ( remove === true ) {
-				delete OBJ_EVENT_HANDLERS[ lguid ];
-			}
-
-			return ret;
-		}
-	}
-
-	if ( document.addEventListener ) {
-		bindEvt = function ( el, type, listener, useCapture ) {
-			// 如果dom支持events模块，文档树中每个node都实现EventTarget接口
-			if ( el ) {
-				el.addEventListener( type, createListenerWrapper( listener ), useCapture );
-			}
-		};
-
-		unbindEvt = function ( el, type, listener, useCapture ) {
-			if ( el ) {
-				el.removeEventListener( type, findListenerWrapper( listener, true ), useCapture );
-			}
-		};
-	} else {
-
-		bindEvt = function ( el, type, listener ) {
-			if ( el ) {
-				el.attachEvent( toIeEventType( type ), createListenerWrapper( listener ) );
-			}
-		};
-
-		unbindEvt = function ( el, type, listener ) {
-			if ( el ) {
-				el.detachEvent( toIeEventType( type ), findListenerWrapper( listener, true ) );
-			}
-		}
-	}
-
-	rootFore.apply( rootFore, {
-		bind: bindEvt,
-
-		unbind: unbindEvt
-	} );
-
-	//Reference: https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
-	rootFore.cookie = {
-		get: function ( name ) {
-			var cookieRegExp = new RegExp( '(?:(?:^|.*;)\\s*' + escape( name ).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$');
-			return unescape( document.cookie.replace( cookieRegExp, '$1' ) ) || null;
-		},
-		set: function ( name, value, option ) {
-			if ( name ) {
-				var cookieStr = escape( name ) + '=' + escape( value );
-
-				if ( option ) {
-					for ( var oKey in option ) {
-						switch ( oKey ) {
-							case 'duration':
-								var durationNum = parseInt( option[ oKey ] ); // in seconds
-
-								if ( !isNaN( durationNum) ) {
-									var d = new Date();
-									d.setTime( d.getTime() + durationNum * 1000 ); // in milliseconds
-									/*
-									 * expires is old standard supported in all browser,
-									 * max-age is new one in HTTP 1.1 supported in morden browser and >= IE9, 
-									 * every browser that supports max-age will ignore the expires regardless of it’s value.
-									 */
-									cookieStr += '; expires=' + d.toUTCString() + '; max-age=' + durationNum; 
-								}
-								
-								break;
-							case 'path':
-								cookieStr += '; path=' + option[ oKey ];
-								break;
-							case 'domain':
-								cookieStr += '; domain=' + option[ oKey ];
-								break;
-							case 'secure':
-								cookieStr += '; secure=' + option[ oKey ];
-								break;
-						}
-					}
-				}
-
-				document.cookie = cookieStr;
-			}
-		},
-		remove: function ( name, option ) {
-			if ( typeof name === 'string' ) {
-				var optionStr = '';
-				if ( option ) {
-					for ( var oKey in option ) {
-						switch ( oKey ) {
-							case 'path':
-								optionStr += '; path=' + option[ oKey ];
-								break;
-							case 'domain':
-								optionStr += '; domain=' + option[ oKey ];
-								break;
-						}
-					}
-				}
-
-				document.cookie = escape( name ) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + optionStr;
-			}	
-		}
-	};
+    if ( global.fore ) {
+        return;
+    }
+
+    var rootFore = global.fore = global.f = {};
+
+    // common utils
+    /*
+     * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
+     * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
+     */
+    var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
+
+    if ( !Array.prototype.forEach ) {
+        Array.prototype.forEach = function ( callback, scope ) {
+            var i;
+            var len = this.length;
+
+            for ( i = 0; i < len; i++ ) {
+                callback.call( scope, this[ i ], i, this );
+            }
+        };
+    }
+
+    if ( !Object.create ) {
+        Object.create = function ( proto, propertiesObject ) {
+            var F = function () {
+
+            };
+            F.prototype = proto;
+            var f = new F();
+
+            rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
+                f[ propertyName ] = propertyValueConfig.value;
+            } );
+
+            return f;
+        };
+    }
+    /*
+     * Merge the contents of two objects together into the first object.
+     */
+    rootFore.apply = function ( target, obj, cover ) {
+        if ( cover !== false ) {
+            // 覆盖掉同名的属性
+            for ( var key in obj ) {
+                if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
+                    target[ key ] = obj[ key ];
+                }
+            }
+        } else {
+            // 保留同名属性
+            for ( var key in obj ) {
+                if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) && target[ key ] === undefined ) {
+                    target[ key ] = obj[ key ];
+                }
+            }
+        }
+    };
+
+    rootFore.apply( rootFore, {
+        // 全局 GUID 计数器
+        guid: 1, 
+        namespace: function ( nsStr ) {
+            if ( nsStr ) {
+                var nsStrArray = nsStr.split( '.' );
+                var len = nsStrArray.length;
+                var currentNs = global;
+
+                for ( var i = 0; i < len; i++ ) {
+                    var nsName = nsStrArray[ i ];
+
+                    if ( !currentNs[ nsName ] ) {
+                        currentNs[ nsName ] = {};
+                    }
+                    currentNs = currentNs[ nsName ];
+                }
+
+                return currentNs;
+            }
+        },
+
+        trim: function ( str ) {
+            if ( str ) {
+                return str.replace(/^\s+|\s+$/g, '');
+            } else {
+                return str;
+            }
+        },
+
+        isArray: Array.isArray || function ( obj ) {
+            return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
+        },
+
+        each: function ( obj, callback ) {
+            if ( rootFore.isArray( obj ) ) {
+                obj.forEach( callback );
+            } else {
+
+                var key;
+                for ( key in obj ) {
+                    if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
+                        callback( obj[ key ], key, obj );
+                    }
+                }
+            }
+        },
+
+        extend: function ( superClass, subProperty ) {
+            var subClass = function () {
+                superClass.call( this );
+            };
+
+            rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
+                var value = propertyValue;
+                overrides[ propertyName ] = {
+                    value: propertyValue,
+                    configurable: true,
+                    enumerable: true,
+                    writable: true
+                };
+            } );
+
+            subClass.prototype = Object.create( superClass.prototype, subProperty );
+            subClass.prototype.constructor = subClass;
+            subClass.superClass = superClass;
+
+            return subClass;
+        },
+
+        extendSubClass: function ( subClass, superClass, subProperty ) {
+            subClass.prototype = Object.create( superClass.prototype, subProperty );
+            subClass.prototype.constructor = subClass;
+            subClass.superClass = superClass;
+        }
+    } );
+
+    // 匹配非空白字符
+    var REGEXP_NOT_WHITE = /\S+/g;
+    // 匹配元素class之间的分隔符
+    var REGEXP_CLASS = /[\n\r\t\f]/g;
+    // 匹配css名字中横杠及后一个字母
+    var REGEXP_CSS_DASH = /-\w/g;
+    // 匹配ie css名前缀
+    var REGEXP_CSS_MS_PREFIX = /^-ms-/g;
+
+    // 存放css名和js名的映射关系
+    var OBJ_JS_CSS_NAME = {};
+    var OBJ_CSS_TESTER_EL = document.createElement( 'div' );
+
+    // object的原生函数
+    var FN_CORE_TOSTRING = Object.prototype.toString;
+
+    // 各个浏览器在javascript中css名的前缀
+    var ARRAY_JS_CSS_NAME_PREFIX = [ 'Webkit', 'O', 'Moz', 'ms'];
+
+    //pre feature detection
+    rootFore.feature = {
+        isCssFloat: ( function () {
+            return 'cssFloat' in OBJ_CSS_TESTER_EL.style;
+        } )()
+    };
+
+    OBJ_JS_CSS_NAME.float = rootFore.feature.isCssFloat ? 'cssFloat' : 'styleFloat';
+
+    function toCamel( cssName ) {
+        return cssName.replace( REGEXP_CSS_MS_PREFIX, 'ms-').replace( REGEXP_CSS_DASH, function ( matchedStr ){
+                    return matchedStr.substr( 1 ).toUpperCase();
+                } );
+    }
+
+    function parseCssName( propertyName ) {
+        if ( propertyName ) {
+            if ( OBJ_JS_CSS_NAME[ propertyName ] ) {
+                return OBJ_JS_CSS_NAME[ propertyName ];
+            } else {
+
+                var parsedPropertyName = toCamel( propertyName );
+
+                if ( parsedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+                    OBJ_JS_CSS_NAME[ propertyName ] = parsedPropertyName;
+                    return parsedPropertyName;
+                } else {
+
+                    parsedPropertyName = parsedPropertyName.substring( 0, 1 ).toUpperCase() + parsedPropertyName.substr( 1 );
+                    var len = ARRAY_JS_CSS_NAME_PREFIX.length;
+
+                    for ( var i = 0; i < len; i++ ) {
+                        var prefixedPropertyName = ARRAY_JS_CSS_NAME_PREFIX[ i ] + parsedPropertyName;
+                        
+                        if ( prefixedPropertyName in OBJ_CSS_TESTER_EL.style ) {
+                            OBJ_JS_CSS_NAME[ propertyName ] = prefixedPropertyName;
+                            return prefixedPropertyName;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var cptCss;
+    if ( global.event && srcElement in global.event .getComputedStyle ) {
+        cptCss = function ( el, propertyName ) {
+            if ( el ) {
+                var style = global.event && srcElement in global.event .getComputedStyle( el, null );
+
+                return style.getPropertyValue( propertyName ) || style[ propertyName ];
+            }
+        }
+    } else if ( document.documentElement.currentStyle ) {
+
+        cptCss = function ( el, propertyName ) {
+            if ( el ) {
+                var style = el.currentStyle;
+
+                return style[ parseCssName( propertyName ) ];
+            }
+        }
+    }
+
+    rootFore.apply( rootFore, {
+        parseHtml: function ( htmlStr ) {
+            var fragment = document.createDocumentFragment();
+            var tmpRootDiv = document.createElement( 'div' );
+            var nodes = [];
+
+            tmpRootDiv.innerHTML = htmlStr;
+
+            var childNodes = tmpRootDiv.childNodes;
+            var len = childNodes.length;
+
+            for ( var i = 0; i < len; i++ ) {
+                fragment.appendChild( childNodes[ i ].cloneNode( true ) );
+            }
+
+            return fragment;
+        },
+
+        q: function ( elId ) { // elId will be enhanced to selectorStr, currently just support id
+            return document.getElementById( elId );
+        },
+
+        hasClass: function ( el, className ) {
+            if ( el && className ) {
+                if ( el.nodeType === 1 ) {
+
+                    var currentClass = el.className ? ' ' + el.className + ' ' : '';
+                    if ( currentClass.indexOf( ' ' + className + ' ' ) > -1 ) {
+                        return true;
+                    }
+
+                }
+            }
+
+            return false;
+        },
+
+        addClass: function ( el, classNames ) {
+            if ( el && classNames ) {
+                classNames = rootFore.trim( classNames );
+
+                var newClasses = classNames.match( REGEXP_NOT_WHITE );
+
+                if ( el.nodeType === 1 ) {
+                    // 在当前class前后加空格是为了方便下面判断当前class是否存在需要添加的class 
+                    var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
+
+                    var cLen = newClasses.length;
+                    for ( var j = 0; j < cLen; j++ ) {
+                        var newClass = newClasses[ j ];
+                        if ( currentClass.indexOf( ' ' + newClass + ' ' ) < 0 ) {
+                            currentClass += ( newClass + ' ' );
+                        }
+                    }
+
+                    el.className = rootFore.trim( currentClass );
+                }
+
+                return el;
+            }
+        },
+
+        removeClass: function ( el, classNames ) {
+            if ( el && classNames ) {
+                classNames = rootFore.trim( classNames );
+
+                var removedClasses = classNames.match( REGEXP_NOT_WHITE );
+
+                if ( el.nodeType === 1 ) {
+                    // 在当前class前后加空格是为了方便下面判断当前class是否存在需要删除的class 
+                    var currentClass = el.className ? ' ' + rootFore.trim( el.className.replace( REGEXP_CLASS, ' ' ) ) + ' ' : '';
+
+                    if ( currentClass ) {
+                        var cLen = removedClasses.length;
+
+                        for ( var j = 0; j < cLen; j++ ) {
+                            var removedClass = ' ' + removedClasses[ j ] + ' ';
+                            if ( currentClass.indexOf( removedClass ) > -1 ) {
+                                currentClass = currentClass.replace( removedClass, ' ' );
+                            }
+                        }
+
+                        el.className = rootFore.trim( currentClass );
+                    }
+                }
+
+                return el;
+            }
+        },
+
+        remove: function ( el ) {
+            if ( el ) {
+                var p = el.parentNode;
+
+                if ( p ) {
+                    p.removeChild( el );
+                    // DANGER: 没有移除当前节点的所有事件监听
+                }
+                return el;
+            }
+        },
+
+        prependChild: function ( el, childElement ) {
+            if ( el && childElement ) {
+                var nodeType = el.nodeType;
+
+                if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+                    el.insertBefore( childElement, el.firstChild );
+                }
+
+                return el;
+            }
+        },
+
+        prependChildHtml: function ( el, htmlStr ) {
+            if ( el && htmlStr ) {
+                var nodeType = el.nodeType;
+                var fragment = rootFore.parseHtml( htmlStr );
+
+                if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+                    el.insertBefore( fragment, el.firstChild );
+                }
+
+                return el;
+            }
+        },
+
+        getStyle: function ( el, propertyName ) {
+            if ( el && propertyName ) {
+                // 把css的属性名转换成js中style的属性名
+                var formatPorpertyName = parseCssName( propertyName );
+                
+                if ( el.nodeType === 1 && formatPorpertyName ) {
+                    return el.style[ formatPorpertyName ];
+                }
+            }
+        },
+
+        getStyles: function ( propertyNames ) {
+            // TODO
+        },
+
+        setStyle: function ( el, nameValues ) {
+            if ( el && nameValues ) {
+                var formatNameValues = {};
+
+                for ( var key in nameValues ) {
+                    if ( nameValues.hasOwnProperty( key ) ) {
+                        // 把css的属性名转换成js中style的属性名
+                        var parsedName = parseCssName( key );
+                        parsedName ? formatNameValues[ parsedName ] = nameValues[ key ] : '';
+                    }
+
+                    if ( el.nodeType === 1 ) {
+                        rootFore.apply( el.style, formatNameValues );
+                    }
+                }
+            }
+        },
+
+        getWidth: function ( el ) {
+            cptCss( el, 'width' );
+        },
+
+        getHeight: function ( el ) {
+            cptCss( el, 'height' );
+        }
+
+    } );
+
+    var bindEvt;
+    var unbindEvt;
+    var OBJ_EVENT_HANDLERS = {};
+
+    rootFore.Event = function ( e ) {
+        var fromElement = e.fromElement;
+
+        this.originalEvent = e;
+        this.target = e.target || e.srcElement;
+        this.metaKey = !!e.metaKey;
+        this.relatedTarget = e.relatedTarget || ( fromElement === this.target ) ? e.fromElement : e.toElement;
+    };
+
+
+    rootFore.Event.prototype = {
+        stopPropagation: function () {
+            var oe = this.originalEvent;
+
+            if ( oe.stopPropagation ) {
+                oe.stopPropagation();
+            }
+            oe.cancelBubble = true;
+        },
+
+        preventDefault: function () {
+            var oe = this.originalEvent;
+
+            if ( oe.preventDefault ) {
+                oe.preventDefault();
+            }
+            oe.returnValue = false;
+        }
+    };
+
+    function toIeEventType( type ) {
+        return type ? 'on' + type : type;
+    }
+
+    function createListenerWrapper( listener ) {
+        if ( !listener.guid ) {
+            listener.guid = rootFore.guid++;
+        }
+
+        var wrapper = function ( e ) {
+            listener.call( this, new rootFore.Event( e || window.event ) );
+        };
+        OBJ_EVENT_HANDLERS[ listener.guid ] = wrapper;
+        
+        return wrapper;
+    }
+
+    function findListenerWrapper( listener, remove ) {
+        var lguid = listener.guid;
+
+        if ( lguid ) {
+            var ret = OBJ_EVENT_HANDLERS[ lguid ];
+
+            if ( remove === true ) {
+                delete OBJ_EVENT_HANDLERS[ lguid ];
+            }
+
+            return ret;
+        }
+    }
+
+    if ( document.addEventListener ) {
+        bindEvt = function ( el, type, listener, useCapture ) {
+            // 如果dom支持events模块，文档树中每个node都实现EventTarget接口
+            if ( el ) {
+                el.addEventListener( type, createListenerWrapper( listener ), useCapture );
+            }
+        };
+
+        unbindEvt = function ( el, type, listener, useCapture ) {
+            if ( el ) {
+                el.removeEventListener( type, findListenerWrapper( listener, true ), useCapture );
+            }
+        };
+    } else {
+
+        bindEvt = function ( el, type, listener ) {
+            if ( el ) {
+                el.attachEvent( toIeEventType( type ), createListenerWrapper( listener ) );
+            }
+        };
+
+        unbindEvt = function ( el, type, listener ) {
+            if ( el ) {
+                el.detachEvent( toIeEventType( type ), findListenerWrapper( listener, true ) );
+            }
+        }
+    }
+
+    rootFore.apply( rootFore, {
+        bind: bindEvt,
+
+        unbind: unbindEvt
+    } );
+
+    //Reference: https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
+    rootFore.cookie = {
+        get: function ( name ) {
+            var cookieRegExp = new RegExp( '(?:(?:^|.*;)\\s*' + escape( name ).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$');
+            return unescape( document.cookie.replace( cookieRegExp, '$1' ) ) || null;
+        },
+        set: function ( name, value, option ) {
+            if ( name ) {
+                var cookieStr = escape( name ) + '=' + escape( value );
+
+                if ( option ) {
+                    for ( var oKey in option ) {
+                        switch ( oKey ) {
+                            case 'duration':
+                                var durationNum = parseInt( option[ oKey ] ); // in seconds
+
+                                if ( !isNaN( durationNum) ) {
+                                    var d = new Date();
+                                    d.setTime( d.getTime() + durationNum * 1000 ); // in milliseconds
+                                    /*
+                                     * expires is old standard supported in all browser,
+                                     * max-age is new one in HTTP 1.1 supported in morden browser and >= IE9, 
+                                     * every browser that supports max-age will ignore the expires regardless of it’s value.
+                                     */
+                                    cookieStr += '; expires=' + d.toUTCString() + '; max-age=' + durationNum; 
+                                }
+                                
+                                break;
+                            case 'path':
+                                cookieStr += '; path=' + option[ oKey ];
+                                break;
+                            case 'domain':
+                                cookieStr += '; domain=' + option[ oKey ];
+                                break;
+                            case 'secure':
+                                cookieStr += '; secure=' + option[ oKey ];
+                                break;
+                        }
+                    }
+                }
+
+                document.cookie = cookieStr;
+            }
+        },
+        remove: function ( name, option ) {
+            if ( typeof name === 'string' ) {
+                var optionStr = '';
+                if ( option ) {
+                    for ( var oKey in option ) {
+                        switch ( oKey ) {
+                            case 'path':
+                                optionStr += '; path=' + option[ oKey ];
+                                break;
+                            case 'domain':
+                                optionStr += '; domain=' + option[ oKey ];
+                                break;
+                        }
+                    }
+                }
+
+                document.cookie = escape( name ) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + optionStr;
+            }    
+        }
+    };
 
 /*
     json2.js
@@ -1040,17 +1040,17 @@ if (typeof JSON !== 'object') {
     }
 }());
 
-	/*
-	 * using third-party lib json2.js https://github.com/douglascrockford/JSON-js, 
-	 * which is under ../lib/JSON-js-master
-	 */
-	rootFore.json = {
-		parse: function ( str ) {
-			return JSON.parse( str );
-		},
-		stringify: function ( jsonObj ) {
-			return JSON.stringify( jsonObj );
-		}
-	};
+    /*
+     * using third-party lib json2.js https://github.com/douglascrockford/JSON-js, 
+     * which is under ../lib/JSON-js-master
+     */
+    rootFore.json = {
+        parse: function ( str ) {
+            return JSON.parse( str );
+        },
+        stringify: function ( jsonObj ) {
+            return JSON.stringify( jsonObj );
+        }
+    };
 
 })(this);

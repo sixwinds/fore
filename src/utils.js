@@ -1,130 +1,130 @@
-	// common utils
-	/*
-	 * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
-	 * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
-	 */
-	var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
+    // common utils
+    /*
+     * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
+     * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
+     */
+    var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
 
-	if ( !Array.prototype.forEach ) {
-		Array.prototype.forEach = function ( callback, scope ) {
-			var i;
-			var len = this.length;
+    if ( !Array.prototype.forEach ) {
+        Array.prototype.forEach = function ( callback, scope ) {
+            var i;
+            var len = this.length;
 
-			for ( i = 0; i < len; i++ ) {
-				callback.call( scope, this[ i ], i, this );
-			}
-		};
-	}
+            for ( i = 0; i < len; i++ ) {
+                callback.call( scope, this[ i ], i, this );
+            }
+        };
+    }
 
-	if ( !Object.create ) {
-		Object.create = function ( proto, propertiesObject ) {
-			var F = function () {
+    if ( !Object.create ) {
+        Object.create = function ( proto, propertiesObject ) {
+            var F = function () {
 
-			};
-			F.prototype = proto;
-			var f = new F();
+            };
+            F.prototype = proto;
+            var f = new F();
 
-			rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
-				f[ propertyName ] = propertyValueConfig.value;
-			} );
+            rootFore.each( propertiesObject, function ( propertyValueConfig, propertyName ) {
+                f[ propertyName ] = propertyValueConfig.value;
+            } );
 
-			return f;
-		};
-	}
-	/*
-	 * Merge the contents of two objects together into the first object.
-	 */
-	rootFore.apply = function ( target, obj, cover ) {
-		if ( cover !== false ) {
-			// 覆盖掉同名的属性
-			for ( var key in obj ) {
-				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		} else {
-			// 保留同名属性
-			for ( var key in obj ) {
-				if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) && target[ key ] === undefined ) {
-					target[ key ] = obj[ key ];
-				}
-			}
-		}
-	};
+            return f;
+        };
+    }
+    /*
+     * Merge the contents of two objects together into the first object.
+     */
+    rootFore.apply = function ( target, obj, cover ) {
+        if ( cover !== false ) {
+            // 覆盖掉同名的属性
+            for ( var key in obj ) {
+                if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
+                    target[ key ] = obj[ key ];
+                }
+            }
+        } else {
+            // 保留同名属性
+            for ( var key in obj ) {
+                if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) && target[ key ] === undefined ) {
+                    target[ key ] = obj[ key ];
+                }
+            }
+        }
+    };
 
-	rootFore.apply( rootFore, {
-		// 全局 GUID 计数器
-		guid: 1, 
-		namespace: function ( nsStr ) {
-			if ( nsStr ) {
-				var nsStrArray = nsStr.split( '.' );
-				var len = nsStrArray.length;
-				var currentNs = global;
+    rootFore.apply( rootFore, {
+        // 全局 GUID 计数器
+        guid: 1, 
+        namespace: function ( nsStr ) {
+            if ( nsStr ) {
+                var nsStrArray = nsStr.split( '.' );
+                var len = nsStrArray.length;
+                var currentNs = global;
 
-				for ( var i = 0; i < len; i++ ) {
-					var nsName = nsStrArray[ i ];
+                for ( var i = 0; i < len; i++ ) {
+                    var nsName = nsStrArray[ i ];
 
-					if ( !currentNs[ nsName ] ) {
-						currentNs[ nsName ] = {};
-					}
-					currentNs = currentNs[ nsName ];
-				}
+                    if ( !currentNs[ nsName ] ) {
+                        currentNs[ nsName ] = {};
+                    }
+                    currentNs = currentNs[ nsName ];
+                }
 
-				return currentNs;
-			}
-		},
+                return currentNs;
+            }
+        },
 
-		trim: function ( str ) {
-			if ( str ) {
-				return str.replace(/^\s+|\s+$/g, '');
-			} else {
-				return str;
-			}
-		},
+        trim: function ( str ) {
+            if ( str ) {
+                return str.replace(/^\s+|\s+$/g, '');
+            } else {
+                return str;
+            }
+        },
 
-		isArray: Array.isArray || function ( obj ) {
-			return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
-		},
+        isArray: Array.isArray || function ( obj ) {
+            return FN_CORE_TOSTRING.call( obj ) === '[object Array]';
+        },
 
-		each: function ( obj, callback ) {
-			if ( rootFore.isArray( obj ) ) {
-				obj.forEach( callback );
-			} else {
+        each: function ( obj, callback ) {
+            if ( rootFore.isArray( obj ) ) {
+                obj.forEach( callback );
+            } else {
 
-				var key;
-				for ( key in obj ) {
-					if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
-						callback( obj[ key ], key, obj );
-					}
-				}
-			}
-		},
+                var key;
+                for ( key in obj ) {
+                    if ( FN_CORE_HASOWNPROPERTY.call( obj, key ) ) {
+                        callback( obj[ key ], key, obj );
+                    }
+                }
+            }
+        },
 
-		extend: function ( superClass, subProperty ) {
-			var subClass = function () {
-				superClass.call( this );
-			};
+        extend: function ( superClass, subProperty ) {
+            var subClass = function () {
+                superClass.call( this );
+            };
 
-			rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
-				var value = propertyValue;
-				overrides[ propertyName ] = {
-					value: propertyValue,
-					configurable: true,
-					enumerable: true,
-					writable: true
-				};
-			} );
+            rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
+                var value = propertyValue;
+                overrides[ propertyName ] = {
+                    value: propertyValue,
+                    configurable: true,
+                    enumerable: true,
+                    writable: true
+                };
+            } );
 
-			subClass.prototype = Object.create( superClass.prototype, subProperty );
-			subClass.prototype.constructor = subClass;
-			subClass.superClass = superClass;
+            subClass.prototype = Object.create( superClass.prototype, subProperty );
+            subClass.prototype.constructor = subClass;
+            subClass.superClass = superClass;
 
-			return subClass;
-		},
+            return subClass;
+        },
 
-		extendSubClass: function ( subClass, superClass, subProperty ) {
-			subClass.prototype = Object.create( superClass.prototype, subProperty );
-			subClass.prototype.constructor = subClass;
-			subClass.superClass = superClass;
-		}
-	} );
+        extendSubClass: function ( subClass, superClass, subProperty ) {
+            subClass.prototype = Object.create( superClass.prototype, subProperty );
+            subClass.prototype.constructor = subClass;
+            subClass.superClass = superClass;
+        }
+    } );

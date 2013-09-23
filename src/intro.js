@@ -1,4 +1,4 @@
 (function ( global, undefined ) {
-	if ( global.fore ) {
-		return;
-	}
+    if ( global.fore ) {
+        return;
+    }
