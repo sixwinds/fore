@@ -28,3 +28,7 @@ test( 'object each iterator', function () {
 
     deepEqual( testedObject, fakeObject );
 } );
+
+// test( 'extend', function () {
+
+// } )
