@@ -7,7 +7,6 @@
 * scrollLeft
 * scrollTop
 * val
-* ajax
 * getStyles
 * jquery里面的csshooks？
 
@@ -39,3 +38,4 @@
 + jquery-1.10.2.js $().width/height() =&gt; line:9718 =&gt; line:9724 jQuery.access =&gt; line:9749 jQuery.css =&gt; line:7046
 + height getComputedStyle 在ie和其他浏览器下有的返回em有的返回px的统一性没有做，如果getComputedStyle返回为null，则用el.style替代( why )
 + width 同上
++ ajax

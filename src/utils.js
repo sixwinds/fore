@@ -1,4 +1,21 @@
-    // common utils
+    /*
+		                         tttt            iiii  lllllll                  
+		                      ttt:::t           i::::i l:::::l                  
+		                      t:::::t            iiii  l:::::l                  
+		                      t:::::t                  l:::::l                  
+		uuuuuu    uuuuuuttttttt:::::ttttttt    iiiiiii  l::::l     ssssssssss   
+		u::::u    u::::ut:::::::::::::::::t    i:::::i  l::::l   ss::::::::::s  
+		u::::u    u::::ut:::::::::::::::::t     i::::i  l::::l ss:::::::::::::s 
+		u::::u    u::::utttttt:::::::tttttt     i::::i  l::::l s::::::ssss:::::s
+		u::::u    u::::u      t:::::t           i::::i  l::::l  s:::::s  ssssss 
+		u::::u    u::::u      t:::::t           i::::i  l::::l    s::::::s      
+		u::::u    u::::u      t:::::t           i::::i  l::::l       s::::::s   
+		u:::::uuuu:::::u      t:::::t    tttttt i::::i  l::::l ssssss   s:::::s 
+		u:::::::::::::::uu    t::::::tttt:::::ti::::::il::::::ls:::::ssss::::::s
+		 u:::::::::::::::u    tt::::::::::::::ti::::::il::::::ls::::::::::::::s 
+		  uu::::::::uu:::u      tt:::::::::::tti::::::il::::::l s:::::::::::ss  
+		    uuuuuuuu  uuuu        ttttttttttt  iiiiiiiillllllll  sssssssssss    
+    */
     /*
      * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
      * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。

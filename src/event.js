@@ -1,3 +1,21 @@
+    /*
+		                                                                                       tttt          
+		                                                                                    ttt:::t          
+		                                                                                    t:::::t          
+		                                                                                    t:::::t          
+		    eeeeeeeeeeee  vvvvvvv           vvvvvvv eeeeeeeeeeee    nnnn  nnnnnnnn    ttttttt:::::ttttttt    
+		  ee::::::::::::ee v:::::v         v:::::vee::::::::::::ee  n:::nn::::::::nn  t:::::::::::::::::t    
+		 e::::::eeeee:::::eev:::::v       v:::::ve::::::eeeee:::::een::::::::::::::nn t:::::::::::::::::t    
+		e::::::e     e:::::e v:::::v     v:::::ve::::::e     e:::::enn:::::::::::::::ntttttt:::::::tttttt    
+		e:::::::eeeee::::::e  v:::::v   v:::::v e:::::::eeeee::::::e  n:::::nnnn:::::n      t:::::t          
+		e:::::::::::::::::e    v:::::v v:::::v  e:::::::::::::::::e   n::::n    n::::n      t:::::t          
+		e::::::eeeeeeeeeee      v:::::v:::::v   e::::::eeeeeeeeeee    n::::n    n::::n      t:::::t          
+		e:::::::e                v:::::::::v    e:::::::e             n::::n    n::::n      t:::::t    tttttt
+		e::::::::e                v:::::::v     e::::::::e            n::::n    n::::n      t::::::tttt:::::t
+		 e::::::::eeeeeeee         v:::::v       e::::::::eeeeeeee    n::::n    n::::n      tt::::::::::::::t
+		  ee:::::::::::::e          v:::v         ee:::::::::::::e    n::::n    n::::n        tt:::::::::::tt
+		    eeeeeeeeeeeeee           vvv            eeeeeeeeeeeeee    nnnnnn    nnnnnn          ttttttttttt  
+    */
     var bindEvt;
     var unbindEvt;
     var OBJ_EVENT_HANDLERS = {};

@@ -1,3 +1,17 @@
+	/*
+		    cccccccccccccccc   ooooooooooo   rrrrr   rrrrrrrrr       eeeeeeeeeeee    
+		  cc:::::::::::::::c oo:::::::::::oo r::::rrr:::::::::r    ee::::::::::::ee  
+		 c:::::::::::::::::co:::::::::::::::or:::::::::::::::::r  e::::::eeeee:::::ee
+		c:::::::cccccc:::::co:::::ooooo:::::orr::::::rrrrr::::::re::::::e     e:::::e
+		c::::::c     ccccccco::::o     o::::o r:::::r     r:::::re:::::::eeeee::::::e
+		c:::::c             o::::o     o::::o r:::::r     rrrrrrre:::::::::::::::::e 
+		c:::::c             o::::o     o::::o r:::::r            e::::::eeeeeeeeeee  
+		c::::::c     ccccccco::::o     o::::o r:::::r            e:::::::e           
+		c:::::::cccccc:::::co:::::ooooo:::::o r:::::r            e::::::::e          
+		 c:::::::::::::::::co:::::::::::::::o r:::::r             e::::::::eeeeeeee  
+		  cc:::::::::::::::c oo:::::::::::oo  r:::::r              ee:::::::::::::e  
+		    cccccccccccccccc   ooooooooooo    rrrrrrr                eeeeeeeeeeeeee 
+	*/
     // 匹配非空白字符
     var REGEXP_NOT_WHITE = /\S+/g;
     // 匹配元素class之间的分隔符

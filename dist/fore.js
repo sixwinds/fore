@@ -3,9 +3,52 @@
         return;
     }
 
+    /*
+                                                   bbbbbbbb                                      
+                           lllllll                 b::::::b                              lllllll 
+                           l:::::l                 b::::::b                              l:::::l 
+                           l:::::l                 b::::::b                              l:::::l 
+                           l:::::l                  b:::::b                              l:::::l 
+           ggggggggg   gggggl::::l    ooooooooooo   b:::::bbbbbbbbb      aaaaaaaaaaaaa    l::::l 
+          g:::::::::ggg::::gl::::l  oo:::::::::::oo b::::::::::::::bb    a::::::::::::a   l::::l 
+         g:::::::::::::::::gl::::l o:::::::::::::::ob::::::::::::::::b   aaaaaaaaa:::::a  l::::l 
+        g::::::ggggg::::::ggl::::l o:::::ooooo:::::ob:::::bbbbb:::::::b           a::::a  l::::l 
+        g:::::g     g:::::g l::::l o::::o     o::::ob:::::b    b::::::b    aaaaaaa:::::a  l::::l 
+        g:::::g     g:::::g l::::l o::::o     o::::ob:::::b     b:::::b  aa::::::::::::a  l::::l 
+        g:::::g     g:::::g l::::l o::::o     o::::ob:::::b     b:::::b a::::aaaa::::::a  l::::l 
+        g::::::g    g:::::g l::::l o::::o     o::::ob:::::b     b:::::ba::::a    a:::::a  l::::l 
+        g:::::::ggggg:::::gl::::::lo:::::ooooo:::::ob:::::bbbbbb::::::ba::::a    a:::::a l::::::l
+         g::::::::::::::::gl::::::lo:::::::::::::::ob::::::::::::::::b a:::::aaaa::::::a l::::::l
+          gg::::::::::::::gl::::::l oo:::::::::::oo b:::::::::::::::b   a::::::::::aa:::al::::::l
+            gggggggg::::::gllllllll   ooooooooooo   bbbbbbbbbbbbbbbb     aaaaaaaaaa  aaaallllllll
+                    g:::::g                                                                      
+        gggggg      g:::::g                                                                      
+        g:::::gg   gg:::::g                                                                      
+         g::::::ggg:::::::g                                                                      
+          gg:::::::::::::g                                                                       
+            ggg::::::ggg                                                                         
+               gggggg                                                                            
+    */
     var rootFore = global.fore = global.f = {};
 
-    // common utils
+    /*
+		                         tttt            iiii  lllllll                  
+		                      ttt:::t           i::::i l:::::l                  
+		                      t:::::t            iiii  l:::::l                  
+		                      t:::::t                  l:::::l                  
+		uuuuuu    uuuuuuttttttt:::::ttttttt    iiiiiii  l::::l     ssssssssss   
+		u::::u    u::::ut:::::::::::::::::t    i:::::i  l::::l   ss::::::::::s  
+		u::::u    u::::ut:::::::::::::::::t     i::::i  l::::l ss:::::::::::::s 
+		u::::u    u::::utttttt:::::::tttttt     i::::i  l::::l s::::::ssss:::::s
+		u::::u    u::::u      t:::::t           i::::i  l::::l  s:::::s  ssssss 
+		u::::u    u::::u      t:::::t           i::::i  l::::l    s::::::s      
+		u::::u    u::::u      t:::::t           i::::i  l::::l       s::::::s   
+		u:::::uuuu:::::u      t:::::t    tttttt i::::i  l::::l ssssss   s:::::s 
+		u:::::::::::::::uu    t::::::tttt:::::ti::::::il::::::ls:::::ssss::::::s
+		 u:::::::::::::::u    tt::::::::::::::ti::::::il::::::ls::::::::::::::s 
+		  uu::::::::uu:::u      tt:::::::::::tti::::::il::::::l s:::::::::::ss  
+		    uuuuuuuu  uuuu        ttttttttttt  iiiiiiiillllllll  sssssssssss    
+    */
     /*
      * ie9以下原生宿主的对象譬如：window，document，没有hasOwnProperty函数，所以需要用
      * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
@@ -137,6 +180,20 @@
         }
     } );
 
+	/*
+		    cccccccccccccccc   ooooooooooo   rrrrr   rrrrrrrrr       eeeeeeeeeeee    
+		  cc:::::::::::::::c oo:::::::::::oo r::::rrr:::::::::r    ee::::::::::::ee  
+		 c:::::::::::::::::co:::::::::::::::or:::::::::::::::::r  e::::::eeeee:::::ee
+		c:::::::cccccc:::::co:::::ooooo:::::orr::::::rrrrr::::::re::::::e     e:::::e
+		c::::::c     ccccccco::::o     o::::o r:::::r     r:::::re:::::::eeeee::::::e
+		c:::::c             o::::o     o::::o r:::::r     rrrrrrre:::::::::::::::::e 
+		c:::::c             o::::o     o::::o r:::::r            e::::::eeeeeeeeeee  
+		c::::::c     ccccccco::::o     o::::o r:::::r            e:::::::e           
+		c:::::::cccccc:::::co:::::ooooo:::::o r:::::r            e::::::::e          
+		 c:::::::::::::::::co:::::::::::::::o r:::::r             e::::::::eeeeeeee  
+		  cc:::::::::::::::c oo:::::::::::oo  r:::::r              ee:::::::::::::e  
+		    cccccccccccccccc   ooooooooooo    rrrrrrr                eeeeeeeeeeeeee 
+	*/
     // 匹配非空白字符
     var REGEXP_NOT_WHITE = /\S+/g;
     // 匹配元素class之间的分隔符
@@ -390,6 +447,24 @@
 
     } );
 
+    /*
+		                                                                                       tttt          
+		                                                                                    ttt:::t          
+		                                                                                    t:::::t          
+		                                                                                    t:::::t          
+		    eeeeeeeeeeee  vvvvvvv           vvvvvvv eeeeeeeeeeee    nnnn  nnnnnnnn    ttttttt:::::ttttttt    
+		  ee::::::::::::ee v:::::v         v:::::vee::::::::::::ee  n:::nn::::::::nn  t:::::::::::::::::t    
+		 e::::::eeeee:::::eev:::::v       v:::::ve::::::eeeee:::::een::::::::::::::nn t:::::::::::::::::t    
+		e::::::e     e:::::e v:::::v     v:::::ve::::::e     e:::::enn:::::::::::::::ntttttt:::::::tttttt    
+		e:::::::eeeee::::::e  v:::::v   v:::::v e:::::::eeeee::::::e  n:::::nnnn:::::n      t:::::t          
+		e:::::::::::::::::e    v:::::v v:::::v  e:::::::::::::::::e   n::::n    n::::n      t:::::t          
+		e::::::eeeeeeeeeee      v:::::v:::::v   e::::::eeeeeeeeeee    n::::n    n::::n      t:::::t          
+		e:::::::e                v:::::::::v    e:::::::e             n::::n    n::::n      t:::::t    tttttt
+		e::::::::e                v:::::::v     e::::::::e            n::::n    n::::n      t::::::tttt:::::t
+		 e::::::::eeeeeeee         v:::::v       e::::::::eeeeeeee    n::::n    n::::n      tt::::::::::::::t
+		  ee:::::::::::::e          v:::v         ee:::::::::::::e    n::::n    n::::n        tt:::::::::::tt
+		    eeeeeeeeeeeeee           vvv            eeeeeeeeeeeeee    nnnnnn    nnnnnn          ttttttttttt  
+    */
     var bindEvt;
     var unbindEvt;
     var OBJ_EVENT_HANDLERS = {};
@@ -489,6 +564,24 @@
         unbind: unbindEvt
     } );
 
+    /*                                                                                               
+		                                                      kkkkkkkk             iiii                      
+		                                                      k::::::k            i::::i                     
+		                                                      k::::::k             iiii                      
+		                                                      k::::::k                                       
+		    cccccccccccccccc   ooooooooooo      ooooooooooo    k:::::k    kkkkkkkiiiiiii     eeeeeeeeeeee    
+		  cc:::::::::::::::c oo:::::::::::oo  oo:::::::::::oo  k:::::k   k:::::k i:::::i   ee::::::::::::ee  
+		 c:::::::::::::::::co:::::::::::::::oo:::::::::::::::o k:::::k  k:::::k   i::::i  e::::::eeeee:::::ee
+		c:::::::cccccc:::::co:::::ooooo:::::oo:::::ooooo:::::o k:::::k k:::::k    i::::i e::::::e     e:::::e
+		c::::::c     ccccccco::::o     o::::oo::::o     o::::o k::::::k:::::k     i::::i e:::::::eeeee::::::e
+		c:::::c             o::::o     o::::oo::::o     o::::o k:::::::::::k      i::::i e:::::::::::::::::e 
+		c:::::c             o::::o     o::::oo::::o     o::::o k:::::::::::k      i::::i e::::::eeeeeeeeeee  
+		c::::::c     ccccccco::::o     o::::oo::::o     o::::o k::::::k:::::k     i::::i e:::::::e           
+		c:::::::cccccc:::::co:::::ooooo:::::oo:::::ooooo:::::ok::::::k k:::::k   i::::::ie::::::::e          
+		 c:::::::::::::::::co:::::::::::::::oo:::::::::::::::ok::::::k  k:::::k  i::::::i e::::::::eeeeeeee  
+		  cc:::::::::::::::c oo:::::::::::oo  oo:::::::::::oo k::::::k   k:::::k i::::::i  ee:::::::::::::e  
+		    cccccccccccccccc   ooooooooooo      ooooooooooo   kkkkkkkk    kkkkkkkiiiiiiii    eeeeeeeeeeeeee                                                                                                    
+    */
     //Reference: https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
     rootFore.cookie = {
         get: function ( name ) {
@@ -1041,6 +1134,31 @@ if (typeof JSON !== 'object') {
     }
 }());
 
+    /*
+		            jjjj                                                     
+		           j::::j                                                    
+		            jjjj                                                     
+		                                                                     
+		          jjjjjjj    ssssssssss      ooooooooooo   nnnn  nnnnnnnn    
+		          j:::::j  ss::::::::::s   oo:::::::::::oo n:::nn::::::::nn  
+		           j::::jss:::::::::::::s o:::::::::::::::on::::::::::::::nn 
+		           j::::js::::::ssss:::::so:::::ooooo:::::onn:::::::::::::::n
+		           j::::j s:::::s  ssssss o::::o     o::::o  n:::::nnnn:::::n
+		           j::::j   s::::::s      o::::o     o::::o  n::::n    n::::n
+		           j::::j      s::::::s   o::::o     o::::o  n::::n    n::::n
+		           j::::jssssss   s:::::s o::::o     o::::o  n::::n    n::::n
+		           j::::js:::::ssss::::::so:::::ooooo:::::o  n::::n    n::::n
+		           j::::js::::::::::::::s o:::::::::::::::o  n::::n    n::::n
+		           j::::j s:::::::::::ss   oo:::::::::::oo   n::::n    n::::n
+		           j::::j  sssssssssss       ooooooooooo     nnnnnn    nnnnnn
+		           j::::j                                                    
+		 jjjj      j::::j                                                    
+		j::::jj   j:::::j                                                    
+		j::::::jjj::::::j                                                    
+		 jj::::::::::::j                                                     
+		   jjj::::::jjj                                                      
+		      jjjjjj                                                         		
+    */
     /*
      * using third-party lib json2.js https://github.com/douglascrockford/JSON-js, 
      * which is under ../lib/JSON-js-master
