@@ -11,6 +11,7 @@
      * FN_CORE_HASOWNPROPERTY.call( obj, key )来代替obj.hasOwnProperty( key )。
      */
     var FN_CORE_HASOWNPROPERTY = Object.prototype.hasOwnProperty;
+    var FN_CORE_SLICE = Array.prototype.slice;
 
     if ( !Array.prototype.forEach ) {
         Array.prototype.forEach = function ( callback, scope ) {
@@ -109,7 +110,7 @@
 
         extend: function ( superClass, subProperty ) {
             var subClass = function () {
-                superClass.call( this );
+                superClass.apply( this, FN_CORE_SLICE.call( arguments, 0 ) );
             };
 
             rootFore.each( subProperty, function ( propertyValue, propertyName, overrides ) {
@@ -124,15 +125,15 @@
 
             subClass.prototype = Object.create( superClass.prototype, subProperty );
             subClass.prototype.constructor = subClass;
-            subClass.superClass = superClass;
+            subClass.prototype.superObj = superClass.prototype;
 
             return subClass;
         },
 
         extendSubClass: function ( subClass, superClass, subProperty ) {
-            subClass.prototype = Object.create( superClass.prototype, subProperty );
+            subClass.prototype = Object.create( superClass.prototype, subProperty )
             subClass.prototype.constructor = subClass;
-            subClass.superClass = superClass;
+            subClass.prototype.superObj = superClass.prototype;
         }
     } );
 
