@@ -52,6 +52,12 @@
         return ret;
     }
 
+    function ajaxCallback( xhr ) {
+
+         // TODO 同步的问题和此函数写法的问题
+
+    }
+
     rootFore.ajax = {
         createXhr: window.XMLHttpRequest ? createXmlHttpRequest : ( window.ActiveXObject ? createMsXmlHttp : undefined ),
 
@@ -70,18 +76,16 @@
                 var method = option.method || 'GET';
                 var url = option.url; 
                 var params = option.params;
-                // 默认是异步的
-                var async = option.async === false ? false : true;
+                var async = option.async === false ? false : true; // 默认是异步的
 
                 var xhr = this.createXhr();
-                xhr.onreadystatechange = function () {
-                    // TODO 同步的问题和此函数写法的问题
-                };
+                xhr.onreadystatechange = ajaxCallback;
 
                 var sendData = null;
                 if ( 'GET' === method ) {
                     xhr.open( method, formatGetUrl( url, params ), async);
                 } else if ( 'POST' === method ) {
+
                     xhr.open( method, url, async);
                     xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
                     sendData = this.serialize( sendData );
