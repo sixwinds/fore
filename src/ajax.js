@@ -52,10 +52,41 @@
         return ret;
     }
 
-    function ajaxCallback( xhr ) {
+    AjaxDataParser = {
+        xml: {
+            getData: function ( xhr ) {
+                return xhr.responseXML
+            }
+        },
 
-         // TODO 同步的问题和此函数写法的问题
+        json: {
+            getData: function ( xhr ) {
+                return rootFore.json.parse( xhr.responseText );
+            }
+        },
 
+        text: {
+            getData: function ( xhr ) {
+                return xhr.responseText;
+            }
+        }
+    };
+
+    function ajaxCallback( xhr, option ) {
+        var dataType = option.dataType || 'text';
+
+        if ( xhr.readyState === 4 ) {
+            var data = AjaxDataParser[ dataType ].getData( xhr );
+            var s = option.success;
+            var e = option.error;
+
+            if ( httpRequest.status === 200 ) {
+                s( data, xhr );
+            } else {
+
+                e( data, xhr );
+            }
+        }
     }
 
     rootFore.ajax = {
@@ -68,6 +99,10 @@
          *     url: string
          *     params: object
          *     async : boolean
+         *     dataType: xml, json. jsonp, text
+         *     success: function
+         *     error: function
+         *     timeout: number
          * }
          * 以后还会增加对header参数的设置，和crossdomain的设置
          */
@@ -79,8 +114,10 @@
                 var async = option.async === false ? false : true; // 默认是异步的
 
                 var xhr = this.createXhr();
-                xhr.onreadystatechange = ajaxCallback;
-
+                xhr.onreadystatechange = function () {
+                    ajaxCallback( xhr, option );
+                };
+                // 处理datatype是xml时候的情况
                 var sendData = null;
                 if ( 'GET' === method ) {
                     xhr.open( method, formatGetUrl( url, params ), async);
