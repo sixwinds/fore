@@ -49,6 +49,22 @@
             return f;
         };
     }
+
+    var parseXmlImpl;
+    if ( global.DOMParser ) {
+        parseXmlImpl = function ( str ) {
+                return new DOMParser().parseFromString( str , "text/xml" );
+        }
+    } else {
+        parseXmlImpl = function ( str ) {
+                var xml = new ActiveXObject( "Microsoft.XMLDOM" );
+                xml.async = "false";
+                xml.loadXML( str );
+
+                return xml;
+        }
+    }
+
     /*
      * Merge the contents of two objects together into the first object.
      */
@@ -143,5 +159,7 @@
             subClass.prototype = Object.create( superClass.prototype, subProperty )
             subClass.prototype.constructor = subClass;
             subClass.prototype.superObj = superClass.prototype;
-        }
+        },
+
+        parseXml: parseXmlImpl
     } );

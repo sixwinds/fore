@@ -60,7 +60,7 @@
         }
 
         var wrapper = function ( e ) {
-            listener.call( this, new rootFore.Event( e || window.event ) );
+            listener.call( this, new rootFore.Event( e || global.event ) );
         };
         OBJ_EVENT_HANDLERS[ listener.guid ] = wrapper;
         

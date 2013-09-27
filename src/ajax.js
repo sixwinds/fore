@@ -55,7 +55,13 @@
     AjaxDataParser = {
         xml: {
             getData: function ( xhr ) {
-                return xhr.responseXML
+                var retXml = xhr.responseXML;
+                var responseText = xhr.responseText;
+
+                if ( !retXml && responseText ) {
+                    retXml = rootFore.parseXml( responseText );
+                }
+                return retXml;
             }
         },
 
@@ -89,8 +95,16 @@
         }
     }
 
+    function forceXmlParsing( xhr ) {
+        if ( xhr.overrideMimeType ) {
+            xhr.overrideMimeType( 'text/xml' );
+        }
+    }
+
     rootFore.ajax = {
-        createXhr: window.XMLHttpRequest ? createXmlHttpRequest : ( window.ActiveXObject ? createMsXmlHttp : undefined ),
+
+
+        createXhr: global.XMLHttpRequest ? createXmlHttpRequest : ( global.ActiveXObject ? createMsXmlHttp : undefined ),
 
         serialize: serializeParams,
         /*
@@ -102,7 +116,7 @@
          *     dataType: xml, json. jsonp, text
          *     success: function
          *     error: function
-         *     timeout: number
+         *     timeout: number (还不支持)
          * }
          * 以后还会增加对header参数的设置，和crossdomain的设置
          */
@@ -112,6 +126,7 @@
                 var url = option.url; 
                 var params = option.params;
                 var async = option.async === false ? false : true; // 默认是异步的
+                var dataType = option.dataType || 'text';
 
                 var xhr = this.createXhr();
                 xhr.onreadystatechange = function () {
@@ -127,8 +142,22 @@
                     xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
                     sendData = this.serialize( sendData );
                 }
-                
+
+                if ( 'xml' === dataType ) {
+                    /*
+                     * 针对某些特定版本的mozillar浏览器的BUG进行修正   
+                     * 具体来说：
+                     * 如果来自服务器的响应没有 XML mime-type 头部，则一些版本的 Mozilla 浏览器不能正常运行 
+                     */
+                    forceXmlParsing( xhr );
+                }
+
                 xhr.send( sendData );
+
+                // 同步的ajax call需要在调用完send之后主动去调用回调函数，因为onreadystatechange不会被触发
+                if ( !async ) {
+                  ajaxCallback( xhr, option );
+                }
             }
         },
 
